@@ -3,7 +3,7 @@ import { AreaModel } from "./area_model.js";
 
 export const AreaService = {
   async getAll() {
-    return await AreaModel.find().populate("id_sector").populate("id_empresa");
+    return await AreaModel.find().populate("id_empresa");
   },
 
   async getById(id) {

@@ -8,16 +8,16 @@ export const SectorService = {
 
   async obtenerSectores() {
     return await SectorModel.find()
-      .populate("id_usuario_creo", "nombre_usuario email")
-      .populate("id_usuario_modifico", "nombre_usuario email")
-      .populate("id_empresa", "nombre_empresa");
+//      .populate("id_usuario_creo", "nombre_usuario email")
+//      .populate("id_usuario_modifico", "nombre_usuario email")
+//      .populate("id_empresa", "nombre_empresa");
   },
 
   async obtenerSectorPorId(id) {
     return await SectorModel.findById(id)
-      .populate("id_usuario_creo", "nombre_usuario email")
-      .populate("id_usuario_modifico", "nombre_usuario email")
-      .populate("id_empresa", "nombre_empresa");
+ //     .populate("id_usuario_creo", "nombre_usuario email")
+ //     .populate("id_usuario_modifico", "nombre_usuario email")
+ //     .populate("id_empresa", "nombre_empresa");
   },
 
   async actualizarSector(id, data) {

@@ -8,9 +8,11 @@ export const TareaService = {
 
   async obtenerTareas() {
     return await TareaModel.find()
-      .populate("id_area")
-      .populate("id_sector")
-      .populate("id_empresa")
+      .populate("id_area", "nombre_area")
+      .populate("id_sector", "nombre_sector")
+      .populate("id_empresa", "nombre_empresa")
+      .populate("id_descripcion", "nombre_descripcion")
+      .populate("id_item", "nombre_item")
       .populate("responsable", "nombre_usuario email");
   },
 

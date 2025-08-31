@@ -5,13 +5,20 @@ import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
+
+// Importar rutas
 import tareaRoutes from "./components/tarea/tarea_routes.js";
 import usuarioRoutes from "./components/usuario/usuario_routes.js";
 import areaRoutes from "./components/area/area_routes.js";
 import sectorRoutes from "./components/sector/sector_routes.js";
 import empresaRoutes from "./components/empresa/empresa_routes.js";
 import rolRoutes from "./components/rol/rol_routes.js";
+import hhroutes from "./components/hh/hh_routes.js";
+import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
+import itemRoutes from "./components/item/item_routes.js";
 
+
+// Configuración de variables de entorno
 dotenv.config();
 
 const app = express();
@@ -28,6 +35,9 @@ app.use("/api/areas", areaRoutes);
 app.use("/api/sectores", sectorRoutes);
 app.use("/api/empresas", empresaRoutes);
 app.use("/api/roles", rolRoutes);
+app.use("/api/hh", hhroutes);
+app.use("/api/descripciones", descripcionRoutes);
+app.use("/api/items", itemRoutes);
 
 
 // Conexión a MongoDB
