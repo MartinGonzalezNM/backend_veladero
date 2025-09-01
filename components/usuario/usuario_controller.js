@@ -1,6 +1,24 @@
 import { UsuarioService } from "./usuario_service.js";
 
 export const UsuarioController = {
+  // 🔹 LOGIN
+  async login(req, res) {
+    try {
+      const { email, contrasena } = req.body;
+      const result = await UsuarioService.login(email, contrasena);
+      res.json(result);
+    } catch (error) {
+      if (error.message === "Usuario no encontrado") {
+        return res.status(404).json({ error: error.message });
+      }
+      if (error.message === "Contraseña incorrecta") {
+        return res.status(401).json({ error: error.message });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // 🔹 CREAR USUARIO
   async crearUsuario(req, res) {
     try {
       const nuevoUsuario = await UsuarioService.crearUsuario(req.body);
@@ -13,6 +31,15 @@ export const UsuarioController = {
   async obtenerUsuarios(req, res) {
     try {
       const usuarios = await UsuarioService.obtenerUsuarios();
+      res.json(usuarios);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  async obtenerUsuariosPorRol(req, res) {
+    try {
+      const usuarios = await UsuarioService.obtenerUsuariosPorRol();
       res.json(usuarios);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -47,5 +74,5 @@ export const UsuarioController = {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
