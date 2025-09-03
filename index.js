@@ -16,6 +16,7 @@ import rolRoutes from "./components/rol/rol_routes.js";
 import hhroutes from "./components/hh/hh_routes.js";
 import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
 import itemRoutes from "./components/item/item_routes.js";
+import healthRoutes from "./components/health/health_routes.js";
 
 
 // Configuración de variables de entorno
@@ -38,6 +39,7 @@ app.use("/api/roles", rolRoutes);
 app.use("/api/hh", hhroutes);
 app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/health", healthRoutes);
 
 
 // Conexión a MongoDB
