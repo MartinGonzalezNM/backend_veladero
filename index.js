@@ -17,6 +17,8 @@ import hhroutes from "./components/hh/hh_routes.js";
 import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
 import itemRoutes from "./components/item/item_routes.js";
 import healthRoutes from "./components/health/health_routes.js";
+import cpevp002Routes from "./components/cpevp002/cpevp002_routes.js"
+import cpevp002Routes from "./routes/cpevp002_route.js";
 
 
 // Configuración de variables de entorno
@@ -40,6 +42,7 @@ app.use("/api/hh", hhroutes);
 app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/cpevp002", cpevp002Routes);
 
 
 // Conexión a MongoDB
