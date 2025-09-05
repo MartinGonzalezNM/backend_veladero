@@ -1,9 +1,9 @@
-import { Cpevp002Service } from "./cpevp002_service.js";
+import { ItemAService } from "./itema_service";
 
-export const Cpevp002Controller = {
+export const ItemAController = {
   async crear(req, res) {
     try {
-      const registro = await Cpevp002Service.crearCpevp002(req.body);
+      const registro = await ItemAService.crearCpevp002(req.body);
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -12,7 +12,7 @@ export const Cpevp002Controller = {
 
   async obtenerTodos(req, res) {
     try {
-      const registros = await Cpevp002Service.obtenerTodos();
+      const registros = await ItemAService.obtenerTodos();
       res.json(registros);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -21,7 +21,7 @@ export const Cpevp002Controller = {
 
   async obtenerPorId(req, res) {
     try {
-      const registro = await Cpevp002Service.obtenerPorId(req.params.id);
+      const registro = await ItemAService.obtenerPorId(req.params.id);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json(registro);
     } catch (error) {
@@ -31,7 +31,7 @@ export const Cpevp002Controller = {
 
   async actualizar(req, res) {
     try {
-      const registro = await Cpevp002Service.actualizar(req.params.id, req.body);
+      const registro = await ItemAService.actualizar(req.params.id, req.body);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json(registro);
     } catch (error) {
@@ -41,7 +41,7 @@ export const Cpevp002Controller = {
 
   async eliminar(req, res) {
     try {
-      const registro = await Cpevp002Service.eliminar(req.params.id);
+      const registro = await ItemAService.eliminar(req.params.id);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json({ message: "Registro eliminado correctamente" });
     } catch (error) {
@@ -65,7 +65,7 @@ export const Cpevp002Controller = {
         if (fecha_fin) filtros.fecha_inspeccion.$lte = new Date(fecha_fin);
       }
 
-      const registros = await Cpevp002Service.obtenerPorFiltros(filtros);
+      const registros = await ItemAService.obtenerPorFiltros(filtros);
       res.json(registros);
     } catch (error) {
       res.status(500).json({ error: error.message });

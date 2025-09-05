@@ -1,13 +1,13 @@
-import { cpevp002Model } from "./cpevp002_model.js";
+import { ItemAModel } from "./itema_model.js";
 
-export const Cpevp002Service = {
+export const ItemAService = {
   async crearCpevp002(data) {
-    const nuevoRegistro = new cpevp002Model(data);
+    const nuevoRegistro = new ItemAModel(data);
     return await nuevoRegistro.save();
   },
 
   async obtenerTodos() {
-    return await cpevp002Model.find()
+    return await ItemAModel.find()
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
@@ -17,7 +17,7 @@ export const Cpevp002Service = {
   },
 
   async obtenerPorId(id) {
-    return await cpevp002Model.findById(id)
+    return await ItemAModel.findById(id)
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
@@ -27,7 +27,7 @@ export const Cpevp002Service = {
   },
 
   async actualizar(id, data) {
-    return await cpevp002Model.findByIdAndUpdate(id, data, { 
+    return await ItemAModel.findByIdAndUpdate(id, data, { 
       new: true,
       runValidators: true 
     }).populate("id_area")
@@ -39,11 +39,11 @@ export const Cpevp002Service = {
   },
 
   async eliminar(id) {
-    return await cpevp002Model.findByIdAndDelete(id);
+    return await ItemAModel.findByIdAndDelete(id);
   },
 
   async obtenerPorFiltros(filtros) {
-    return await cpevp002Model.find(filtros)
+    return await ItemAModel.find(filtros)
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
