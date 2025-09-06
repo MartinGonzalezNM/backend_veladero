@@ -8,9 +8,7 @@ export const csevr_001Service = {
 
   async obtenerTodos() {
     return await csevr_001Model.find()
-      .populate("id_area")
-      .populate("id_sector")
-      .populate("id_empresa")
+      .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
@@ -18,9 +16,7 @@ export const csevr_001Service = {
 
   async obtenerPorId(id) {
     return await csevr_001Model.findById(id)
-      .populate("id_area")
-      .populate("id_sector")
-      .populate("id_empresa")
+      .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
@@ -30,9 +26,7 @@ export const csevr_001Service = {
     return await csevr_001Model.findByIdAndUpdate(id, data, { 
       new: true,
       runValidators: true 
-    }).populate("id_area")
-      .populate("id_sector")
-      .populate("id_empresa")
+    }).populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
@@ -44,9 +38,7 @@ export const csevr_001Service = {
 
   async obtenerPorFiltros(filtros) {
     return await csevr_001Model.find(filtros)
-      .populate("id_area")
-      .populate("id_sector")
-      .populate("id_empresa")
+      .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
