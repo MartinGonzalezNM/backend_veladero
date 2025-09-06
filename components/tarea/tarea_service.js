@@ -24,8 +24,14 @@ export const TareaService = {
       .populate("responsable", "nombre_usuario email");
   },
 
-  async actualizarTarea(id, data) {
-    return await TareaModel.findByIdAndUpdate(id, data, { new: true });
+  async obtenerTareaPorUsuario(usuarioId) {
+    return await TareaModel.find({ responsable: usuarioId })
+      .populate("id_area", "nombre_area")
+      .populate("id_sector", "nombre_sector")
+      .populate("id_empresa", "nombre_empresa")
+      .populate("id_descripcion", "nombre_descripcion")
+      .populate("id_item", "nombre_item")
+      .populate("responsable", "nombre_usuario email");
   },
 
   async eliminarTarea(id) {

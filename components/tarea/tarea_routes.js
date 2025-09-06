@@ -9,4 +9,6 @@ router.get("/:id", TareaController.obtener);
 router.patch("/:id", TareaController.actualizar);
 router.delete("/:id", TareaController.eliminar);
 
+router.get("/usuario/:usuarioId", TareaController.obtenerPorUsuario);
+
 export default router;
