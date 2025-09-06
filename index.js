@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import { corsOptions } from "./cors.js";
 
 // Importar rutas existentes
 import tareaRoutes from "./components/tarea/tarea_routes.js";
@@ -25,7 +26,7 @@ dotenv.config();
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan("dev"));
 
