@@ -64,6 +64,17 @@ mongoose.connect(process.env.MONGODB_URI, {
     res.send('API is running...');
   });
 
+  // Agrega este endpoint a tu API para ver la IP del servidor
+  app.get('/api/ip', (req, res) => {
+    const serverIp = req.socket.localAddress;
+    const clientIp = req.ip || req.connection.remoteAddress;
+    res.json({ 
+      serverIp, 
+      clientIp,
+      headers: req.headers 
+    });
+  });
+
 })
 .catch((err) => {
   console.error("❌ Error al conectar con MongoDB:", err.message);
