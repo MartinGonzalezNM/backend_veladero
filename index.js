@@ -55,6 +55,15 @@ mongoose.connect(process.env.MONGODB_URI, {
   app.listen(process.env.PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${process.env.PORT}`);
   });
+  
+  app.on('error', (err) => {
+    console.error("❌ Error en el servidor:", err.message);
+  });
+
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+
 })
 .catch((err) => {
   console.error("❌ Error al conectar con MongoDB:", err.message);
