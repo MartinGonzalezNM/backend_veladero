@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import e from "express";
 
 const csevr_001Schema = new mongoose.Schema({
-  id_area: { type: mongoose.Schema.Types.ObjectId, ref: "Area", required: true },
-  id_sector: { type: mongoose.Schema.Types.ObjectId, ref: "Sector", required: true },
-  id_empresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa", required: true },
+  id_tarea: { type: mongoose.Schema.Types.ObjectId, ref: "Tarea", required: true },
+  codigo_formulario: { type: String, default: "CSEVR-001" },
+  nombre_formulario: { type: String, default: "CONTROL DE SPRINKLERS" },
 
   fecha_inspeccion: { type: Date, default: Date.now },
 
