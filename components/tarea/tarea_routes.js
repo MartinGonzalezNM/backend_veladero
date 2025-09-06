@@ -1,6 +1,5 @@
 import express from "express";
 import { TareaController } from "./tarea_controller.js";
-import { cpevp002Model } from "../cpevp002/itema_model.js";
 
 const router = express.Router();
 

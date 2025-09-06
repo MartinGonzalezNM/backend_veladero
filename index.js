@@ -17,7 +17,7 @@ import hhroutes from "./components/hh/hh_routes.js";
 import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
 import itemRoutes from "./components/item/item_routes.js";
 import healthRoutes from "./components/health/health_routes.js";
-import itemRoutes fr
+import segundoRoutes from "./components/segundo/segundo_routes.js"
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -40,6 +40,8 @@ app.use("/api/hh", hhroutes);
 app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/itema", itemRoutes);
+app.use("/api/segundo", segundoRoutes);
 
 
 // Conexión a MongoDB
