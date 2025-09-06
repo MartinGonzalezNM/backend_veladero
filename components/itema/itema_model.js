@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import e from "express";
 
-const ItemASchema = new mongoose.Schema({
+const ItemaSchema = new mongoose.Schema({
   id_area: { type: mongoose.Schema.Types.ObjectId, ref: "Area", required: true },
   id_sector: { type: mongoose.Schema.Types.ObjectId, ref: "Sector", required: true },
   id_empresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa", required: true },
@@ -35,4 +35,4 @@ const ItemASchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const ItemAModel = mongoose.model("cpevp002", ItemASchema);
+export const ItemaModel = mongoose.model("cpevp002", ItemaSchema);

@@ -1,13 +1,13 @@
-import { ItemAModel } from "./itema_model.js";
+import { ItemaModel } from "./itema_model.js";
 
-export const ItemAService = {
+export const ItemaService = {
   async crearCpevp002(data) {
-    const nuevoRegistro = new ItemAModel(data);
+    const nuevoRegistro = new ItemaModel(data);
     return await nuevoRegistro.save();
   },
 
   async obtenerTodos() {
-    return await ItemAModel.find()
+    return await ItemaModel.find()
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
@@ -17,7 +17,7 @@ export const ItemAService = {
   },
 
   async obtenerPorId(id) {
-    return await ItemAModel.findById(id)
+    return await ItemaModel.findById(id)
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
@@ -27,7 +27,7 @@ export const ItemAService = {
   },
 
   async actualizar(id, data) {
-    return await ItemAModel.findByIdAndUpdate(id, data, { 
+    return await ItemaModel.findByIdAndUpdate(id, data, { 
       new: true,
       runValidators: true 
     }).populate("id_area")
@@ -39,11 +39,11 @@ export const ItemAService = {
   },
 
   async eliminar(id) {
-    return await ItemAModel.findByIdAndDelete(id);
+    return await ItemaModel.findByIdAndDelete(id);
   },
 
   async obtenerPorFiltros(filtros) {
-    return await ItemAModel.find(filtros)
+    return await ItemaModel.find(filtros)
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
