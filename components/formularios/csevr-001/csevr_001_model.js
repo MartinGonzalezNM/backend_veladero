@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import e from "express";
 
-const ItemaSchema = new mongoose.Schema({
+const csevr_001Schema = new mongoose.Schema({
   id_area: { type: mongoose.Schema.Types.ObjectId, ref: "Area", required: true },
   id_sector: { type: mongoose.Schema.Types.ObjectId, ref: "Sector", required: true },
   id_empresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa", required: true },
@@ -25,6 +25,10 @@ const ItemaSchema = new mongoose.Schema({
   },
 
   comentario: { type: String },
+  observaciones: { type: String },
+  nivel_riesgo: { type: String, enum: ["BAJO", "MEDIO", "ALTO"] },
+
+  adjuntos: [{ type: String }], // Array de URLs o rutas de archivos
 
   firmas: {
     supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },
@@ -35,4 +39,4 @@ const ItemaSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const ItemaModel = mongoose.model("cpevp002", ItemaSchema);
+export const csevr_001Model = mongoose.model("csevr_001", csevr_001Schema);

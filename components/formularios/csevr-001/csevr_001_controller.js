@@ -1,9 +1,9 @@
-import { ItemaService } from "./itema_service.js";
+import { csevr_001Service } from "./csevr_001_service.js";
 
-export const ItemaController = {
+export const csevr_001Controller = {
   async crear(req, res) {
     try {
-      const registro = await ItemaService.crearCpevp002(req.body);
+      const registro = await csevr_001Service.crearCsevr001(req.body);
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -12,7 +12,7 @@ export const ItemaController = {
 
   async obtenerTodos(req, res) {
     try {
-      const registros = await ItemaService.obtenerTodos();
+      const registros = await csevr_001Service.obtenerTodos();
       res.json(registros);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -21,7 +21,7 @@ export const ItemaController = {
 
   async obtenerPorId(req, res) {
     try {
-      const registro = await ItemaService.obtenerPorId(req.params.id);
+      const registro = await csevr_001Service.obtenerPorId(req.params.id);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json(registro);
     } catch (error) {
@@ -31,7 +31,7 @@ export const ItemaController = {
 
   async actualizar(req, res) {
     try {
-      const registro = await ItemaService.actualizar(req.params.id, req.body);
+      const registro = await csevr_001Service.actualizar(req.params.id, req.body);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json(registro);
     } catch (error) {
@@ -41,7 +41,7 @@ export const ItemaController = {
 
   async eliminar(req, res) {
     try {
-      const registro = await ItemaService.eliminar(req.params.id);
+      const registro = await csevr_001Service.eliminar(req.params.id);
       if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
       res.json({ message: "Registro eliminado correctamente" });
     } catch (error) {
@@ -65,7 +65,7 @@ export const ItemaController = {
         if (fecha_fin) filtros.fecha_inspeccion.$lte = new Date(fecha_fin);
       }
 
-      const registros = await ItemaService.obtenerPorFiltros(filtros);
+      const registros = await csevr_001Service.obtenerPorFiltros(filtros);
       res.json(registros);
     } catch (error) {
       res.status(500).json({ error: error.message });
