@@ -1,12 +1,10 @@
-
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
-
-// Importar rutas
+// Importar rutas existentes
 import tareaRoutes from "./components/tarea/tarea_routes.js";
 import usuarioRoutes from "./components/usuario/usuario_routes.js";
 import areaRoutes from "./components/area/area_routes.js";
@@ -18,6 +16,8 @@ import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
 import itemRoutes from "./components/item/item_routes.js";
 import healthRoutes from "./components/health/health_routes.js";
 
+// Nueva ruta de firma
+import firmaRoutes from "./components/firma/firma_routes.js";
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -41,6 +41,8 @@ app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/health", healthRoutes);
 
+// Nueva ruta de firma
+app.use("/api/firma", firmaRoutes);
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
