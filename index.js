@@ -20,7 +20,7 @@ import csevr_001Routes from "./components/formularios/csevr-001/csevr_001_routes
 import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
 
 // Nueva ruta de firma
-import firmaRoutes from "./components/firma/firma_Routes.js";
+import firmaRoutes from "./components/firma/firma_routes.js";
 
 // Configuración de variables de entorno
 dotenv.config();
