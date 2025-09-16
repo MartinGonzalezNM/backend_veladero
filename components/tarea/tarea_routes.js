@@ -1,14 +1,15 @@
 import express from "express";
 import { TareaController } from "./tarea_controller.js";
+import { verificarToken } from "../../auth/auth_middleware.js";
 
 const router = express.Router();
 
-router.post("/", TareaController.crear);
-router.get("/", TareaController.listar);
-router.get("/:id", TareaController.obtener);
-router.patch("/:id", TareaController.actualizar);
-router.delete("/:id", TareaController.eliminar);
+router.post("/", verificarToken, TareaController.crear);
+router.get("/", verificarToken, TareaController.listar);
+router.get("/:id", verificarToken, TareaController.obtener);
+router.patch("/:id", verificarToken, TareaController.actualizar);
+router.delete("/:id", verificarToken, TareaController.eliminar);
 
-router.get("/usuario/:usuarioId", TareaController.obtenerPorUsuario);
+router.get("/usuario/:usuarioId", verificarToken, TareaController.obtenerPorUsuario);
 
 export default router;

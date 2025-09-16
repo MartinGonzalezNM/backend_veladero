@@ -2,7 +2,7 @@
 // Configuración de CORS con whitelist
 
 export const allowedOrigins = [
-  'http://localhost:3000',
+  'http://localhost:5173',
   "*",
   // Agrega aquí otros orígenes permitidos
 ];

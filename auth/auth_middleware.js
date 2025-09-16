@@ -1,26 +1,50 @@
-// auth_middleware.js
 import jwt from "jsonwebtoken";
+import { UsuarioModel } from "../components/usuario/usuario_model.js";
 
-export const authMiddleware = async (req, res, next) => {
+export const verificarToken = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
     if (!token) {
-      return res.status(401).json({ message: 'Acceso denegado. Token requerido.' });
+      return res.status(401).json({ 
+        error: "Acceso denegado. Token requerido." 
+      });
     }
 
+    // Verificar y decodificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secreto_dev");
     
-    // Busca el usuario en la base de datos y añádelo a req.user
-    const usuario = await UsuarioModel.findById(decoded.id).select('-contrasena');
-    
+    // Opcional: Verificar si el usuario aún existe en la base de datos
+    const usuario = await UsuarioModel.findById(decoded.id);
     if (!usuario) {
-      return res.status(401).json({ message: 'Token inválido. Usuario no encontrado.' });
+      return res.status(401).json({ 
+        error: "Token inválido. Usuario no encontrado." 
+      });
     }
 
-    req.user = usuario; // ← Esto es crucial
+    // Agregar la información del usuario al request
+    req.user = {
+      id: decoded.id,
+      email: decoded.email
+    };
+
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token inválido.' });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ 
+        error: "Token expirado." 
+      });
+    }
+    
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ 
+        error: "Token inválido." 
+      });
+    }
+
+    console.error("Error en middleware de autenticación:", error);
+    return res.status(500).json({ 
+      error: "Error interno del servidor." 
+    });
   }
 };
