@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadFirmaController } from "./firma_controller.js";
+import { uploadFirmaController } from "./firma_Controller.js";
 
 const router = express.Router();
 
