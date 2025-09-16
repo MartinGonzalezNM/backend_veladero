@@ -18,6 +18,46 @@ export const UsuarioController = {
     }
   },
 
+  async verifyToken(req, res) {
+    try {
+      // ✅ Extraer token del header Authorization
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader) {
+        return res.status(401).json({ 
+          valido: false, 
+          error: "Token no proporcionado" 
+        });
+      }
+
+      // Extraer el token (remover "Bearer ")
+      const token = authHeader.startsWith('Bearer ') 
+        ? authHeader.slice(7) 
+        : authHeader;
+
+      if (!token) {
+        return res.status(401).json({ 
+          valido: false, 
+          error: "Token inválido" 
+        });
+      }
+
+      const result = await UsuarioService.verifyToken(token);
+      
+      // Si el token no es válido, devolver status 401
+      if (!result.valido) {
+        return res.status(401).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error en verifyToken:", error);
+      res.status(500).json({ 
+        valido: false, 
+        error: "Error interno del servidor" 
+      });
+    }
+  },
   // 🔹 CREAR USUARIO
   async crearUsuario(req, res) {
     try {

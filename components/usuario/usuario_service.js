@@ -11,6 +11,46 @@ export const UsuarioService = {
     return await usuario.save();
   },
 
+ async verifyToken(token) {
+    try {
+      // ✅ Verificar que el token existe
+      if (!token) {
+        return { valido: false, error: "Token no proporcionado" };
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET );
+      
+      // Buscar el usuario en la base de datos para obtener datos actualizados
+      const usuario = await UsuarioModel.findById(decoded.id).select('-contrasena');
+      
+      if (!usuario) {
+        return { valido: false, error: "Usuario no encontrado" };
+      }
+
+      return { 
+        valido: true, 
+        usuario: {
+          id: usuario._id,
+          email: usuario.email,
+          nombre: usuario.nombre_usuario,
+          rol: usuario.rol
+        }
+      };
+    } catch (error) {
+      console.error("Error verificando token:", error);
+      
+      // Manejar diferentes tipos de errores JWT
+      if (error.name === 'TokenExpiredError') {
+        return { valido: false, error: "Token expirado" };
+      }
+      if (error.name === 'JsonWebTokenError') {
+        return { valido: false, error: "Token inválido" };
+      }
+      
+      return { valido: false, error: "Error verificando token" };
+    }
+  },
+
   async obtenerUsuarios() {
     return await UsuarioModel.find();
   },
@@ -51,10 +91,15 @@ export const UsuarioService = {
       throw new Error("Contraseña incorrecta");
     }
 
+    // ✅ INCLUIR EL ROL EN EL TOKEN
     const token = jwt.sign(
-      { id: usuario._id, email: usuario.email },
-      process.env.JWT_SECRET || "secreto_dev",
-      { expiresIn: "2h" }
+      { 
+        id: usuario._id, 
+        email: usuario.email,
+        rol: usuario.rol 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "14d" }
     );
 
     return {
@@ -63,6 +108,7 @@ export const UsuarioService = {
         id: usuario._id,
         email: usuario.email,
         nombre: usuario.nombre_usuario,
+        rol: usuario.rol  // ✅ También devolver el rol en la respuesta
       },
     };
   },

@@ -12,7 +12,7 @@ export const verificarToken = async (req, res, next) => {
     }
 
     // Verificar y decodificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secreto_dev");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET );
     
     // Opcional: Verificar si el usuario aún existe en la base de datos
     const usuario = await UsuarioModel.findById(decoded.id);
