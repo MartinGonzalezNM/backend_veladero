@@ -3,7 +3,7 @@
 
 export const allowedOrigins = [
   'http://localhost:5173',
-  "*",
+  'https://forntend-veladero.pages.dev'
   // Agrega aquí otros orígenes permitidos
 ];
 
