@@ -17,9 +17,10 @@ import descripcionRoutes from "./components/descripcion/descripcion_routes.js";
 import itemRoutes from "./components/item/item_routes.js";
 import healthRoutes from "./components/health/health_routes.js";
 import csevr_001Routes from "./components/formularios/csevr-001/csevr_001_routes.js";
+import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
 
 // Nueva ruta de firma
-import firmaRoutes from "./components/firma/firma_routes.js";
+import firmaRoutes from "./components/firma/firma_Routes.js";
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -43,6 +44,7 @@ app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/formulario/csevr-001", csevr_001Routes);
+app.use("/api/formulario/prueba", pruebaRoutes);
 
 // Nueva ruta de firma
 app.use("/api/firma", firmaRoutes);
