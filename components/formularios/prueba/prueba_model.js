@@ -14,7 +14,6 @@ const pruebaSchema = new mongoose.Schema({
   },
 
   comentario: { type: String },
-  firma_imagen: { type: String }, // URL o ruta de la imagen de la firma
 
   //adjuntos: [{ type: String }], // Array de URLs o rutas de archivos
 

@@ -1,16 +1,9 @@
 import { pruebaService } from "./prueba_service.js";
 
 export const pruebaController = {
-
   async crear(req, res) {
     try {
-      const datos = {
-        ...req.body,
-        // Si se subió una imagen, guardar la ruta
-        firma_imagen: req.file ? req.file.path : null
-      };
-      
-      const registro = await pruebaService.crearPrueba(datos);
+      const registro = await pruebaService.crearPrueba(req.body);
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });

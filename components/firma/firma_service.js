@@ -1,4 +1,4 @@
-//import { bucket } from "../config/firebaseAdmin.js";
+import { bucket } from "../config/firebaseAdmin.js";
 
 export const subirFirma = async (base64Firma, nombreArchivo) => {
   try {

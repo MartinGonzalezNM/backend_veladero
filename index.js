@@ -18,8 +18,6 @@ import itemRoutes from "./components/item/item_routes.js";
 import healthRoutes from "./components/health/health_routes.js";
 import csevr_001Routes from "./components/formularios/csevr-001/csevr_001_routes.js";
 import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
-import uploadRoutes from "./components/upload/upload_routes.js";
-
 
 // Nueva ruta de firma
 import firmaRoutes from "./components/firma/firma_routes.js";
@@ -47,7 +45,7 @@ app.use("/api/items", itemRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/formulario/csevr-001", csevr_001Routes);
 app.use("/api/formulario/prueba", pruebaRoutes);
-app.use("/api/upload", uploadRoutes);
+
 // Nueva ruta de firma
 app.use("/api/firma", firmaRoutes);
 
