@@ -1,18 +1,9 @@
-// firebaseAdmin.js - AL PRINCIPIO
 import dotenv from 'dotenv';
 dotenv.config();
 
 import admin from "firebase-admin";
 
 console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
-console.log('FIREBASE_PRIVATE_KEY definida:', !!process.env.FIREBASE_PRIVATE_KEY);
-
-// Validación de seguridad
-if (!process.env.FIREBASE_PRIVATE_KEY) {
-  console.error('ERROR: FIREBASE_PRIVATE_KEY no está definida');
-  console.error('Variables de entorno cargadas:', Object.keys(process.env).filter(key => key.includes('FIREBASE')));
-  throw new Error('FIREBASE_PRIVATE_KEY no está definida en las variables de entorno');
-}
 
 const serviceAccount = {
   type: "service_account",
