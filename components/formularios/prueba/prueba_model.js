@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import e from "express";
 
 const pruebaSchema = new mongoose.Schema({
   id_tarea: { type: mongoose.Schema.Types.ObjectId, ref: "Tarea", required: true },
@@ -15,7 +14,14 @@ const pruebaSchema = new mongoose.Schema({
 
   comentario: { type: String },
 
-  //adjuntos: [{ type: String }], // Array de URLs o rutas de archivos
+  // Campo para una sola imagen
+  imagen: {
+    url: { type: String },
+    nombre_archivo: { type: String },
+    fecha_subida: { type: Date, default: Date.now },
+    tamaño: { type: Number }, // en bytes
+    tipo_mime: { type: String }
+  },
 
   firmas: {
     supervisor: { type: String },
