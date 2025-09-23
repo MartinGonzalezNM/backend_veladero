@@ -15,7 +15,7 @@ const TareaSchema = new mongoose.Schema({
   estado: { 
     type: String, 
     enum: ["activo", "demorado", "cancelado", "finalizado"], 
-    default: "activa" 
+    default: "activo" 
   },
   tiempo_transcurrido: { type: String}, // formato HH:mm:ss
   id_empresa: { type: mongoose.Schema.Types.ObjectId, ref: "Empresa", required: true },

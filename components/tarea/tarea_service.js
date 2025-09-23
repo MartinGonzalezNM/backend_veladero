@@ -24,8 +24,21 @@ export const TareaService = {
       .populate("responsable", "nombre_usuario email");
   },
 
+
+  //obteneer tareas por usuario que esten activas
   async obtenerTareaPorUsuario(usuarioId) {
-    return await TareaModel.find({ responsable: usuarioId })
+    return await TareaModel.find({ responsable: usuarioId, estado: "activa" })
+      .populate("id_area", "nombre_area")
+      .populate("id_sector", "nombre_sector")
+      .populate("id_empresa", "nombre_empresa")
+      .populate("id_descripcion", "nombre_descripcion")
+      .populate("id_item", "nombre_item")
+      .populate("responsable", "nombre_usuario email");
+  },
+
+  //obteneer tareas por usuario que esten finalizadas
+  async obtenerTareaFinalizadaPorUsuario(usuarioId) {
+    return await TareaModel.find({ responsable: usuarioId, estado: "finalizada" })
       .populate("id_area", "nombre_area")
       .populate("id_sector", "nombre_sector")
       .populate("id_empresa", "nombre_empresa")

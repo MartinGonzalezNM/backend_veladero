@@ -54,6 +54,15 @@ export const TareaController = {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
+  },
+
+  async obtenerFinalizadasPorUsuario(req, res) {
+    try {
+      const tareas = await TareaService.obtenerTareaFinalizadaPorUsuario(req.params.usuarioId);
+      res.json(tareas);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 
 };
