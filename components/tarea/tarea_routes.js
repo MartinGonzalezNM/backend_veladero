@@ -12,6 +12,6 @@ router.delete("/:id", verificarToken, TareaController.eliminar);
 
 router.get("/usuario/:usuarioId", verificarToken, TareaController.obtenerPorUsuario);
 
-router.get("/usuario/:usuarioId/finalizadas", verificarToken, TareaController.obtenerFinalizadasPorUsuario);
+router.get("/usuario/:usuarioId/activas", verificarToken, TareaController.obtenerActivasPorUsuario);
 
 export default router;

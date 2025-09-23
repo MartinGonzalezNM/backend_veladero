@@ -25,11 +25,20 @@ const csevr_001Schema = new mongoose.Schema({
   },
 
   comentario: { type: String },
-  observaciones: { type: String },
+
+  // Campo para una sola imagen
+  imagen: {
+    url: { type: String },
+    nombre_archivo: { type: String },
+    fecha_subida: { type: Date, default: Date.now },
+    tamaño: { type: Number }, // en bytes
+    tipo_mime: { type: String }
+  },
+
+  observaciones: { type: String, enum: ["SI", "NO"] },
   nivel_riesgo: { type: String, enum: ["BAJO", "MEDIO", "ALTO"] },
 
-  adjuntos: [{ type: String }], // Array de URLs o rutas de archivos
-
+ 
   firmas: {
     supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },
     supervisor_area: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },

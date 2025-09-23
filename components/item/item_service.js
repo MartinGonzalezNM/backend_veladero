@@ -11,8 +11,10 @@ export const ItemService = {
   },
 
   async obtenerItemPorId(id) {
-    return await ItemModel.findById(id);
+    const item = await ItemModel.findById(id);
+    return item ? item.nombre_item : null;
   },
+  
 
   async actualizarItem(id, data) {
     return await ItemModel.findByIdAndUpdate(id, data, { new: true });

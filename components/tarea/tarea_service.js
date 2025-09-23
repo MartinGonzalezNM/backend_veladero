@@ -37,16 +37,26 @@ export const TareaService = {
   },
 
   //obteneer tareas por usuario que esten finalizadas
-  async obtenerTareaFinalizadaPorUsuario(usuarioId) {
-    return await TareaModel.find({ responsable: usuarioId, estado: "finalizada" })
-      .populate("id_area", "nombre_area")
-      .populate("id_sector", "nombre_sector")
-      .populate("id_empresa", "nombre_empresa")
-      .populate("id_descripcion", "nombre_descripcion")
-      .populate("id_item", "nombre_item")
-      .populate("responsable", "nombre_usuario email");
-  },
+async obtenerTareaActivasPorUsuario(usuarioId) {
+  const tareas = await TareaModel.find({ responsable: usuarioId, estado: "activo" })
+    .populate("id_area", "nombre_area -_id")
+    .populate("id_sector", "nombre_sector -_id")
+    .populate("id_empresa", "nombre_empresa -_id")
+    .populate("id_descripcion", "nombre_descripcion -_id")
+    .populate("id_item", "nombre_item -_id")
+    .populate("responsable", "nombre_usuario email -_id");
 
+  // Transformar para devolver un string en lugar de un objeto
+  return tareas.map(t => ({
+    ...t.toObject(),
+    id_item: t.id_item?.nombre_item ?? null,
+    id_descripcion: t.id_descripcion?.nombre_descripcion ?? null,
+    id_area: t.id_area?.nombre_area ?? null,
+    id_sector: t.id_sector?.nombre_sector ?? null,
+    id_empresa: t.id_empresa?.nombre_empresa ?? null,
+    responsable: t.responsable ? { nombre_usuario: t.responsable.nombre_usuario, email: t.responsable.email } : null
+  }));
+},
   async eliminarTarea(id) {
     return await TareaModel.findByIdAndDelete(id);
   },

@@ -1,5 +1,5 @@
 import { pruebaService } from "./prueba_service.js";
-import { imageService } from "./imageService.js";
+import { imageService } from "../imagenes/imageService.js";
 
 export const pruebaController = {
   async crear(req, res) {
@@ -12,7 +12,8 @@ export const pruebaController = {
         
         const imagenData = await imageService.subirImagen(
           req.body.imagen_base64,
-          req.body.nombre_imagen || 'imagen.jpg'
+          req.body.nombre_imagen || 'imagen.jpg',
+          prueba
         );
         
         datosFormulario.imagen = {

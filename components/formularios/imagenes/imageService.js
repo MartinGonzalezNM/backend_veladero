@@ -2,7 +2,7 @@ import { bucket } from "../../config/firebaseAdmin.js";
 import { v4 as uuidv4 } from 'uuid';
 
 export const imageService = {
-  async subirImagen(base64Imagen, nombreOriginal = 'imagen.jpg') {
+  async subirImagen(base64Imagen, nombreOriginal = 'imagen.jpg', carpeta) {
     try {
       // Extraer el tipo de imagen y convertir base64 a buffer
       const matches = base64Imagen.match(/^data:image\/(\w+);base64,(.+)$/);
@@ -15,7 +15,7 @@ export const imageService = {
       const buffer = Buffer.from(base64Data, "base64");
       
       // Generar nombre único para el archivo
-      const nombreUnico = `pruebas/${uuidv4()}.${extension}`;
+      const nombreUnico = `${carpeta}/${uuidv4()}.${extension}`;
       
       // Crear archivo en Firebase Storage
       const file = bucket.file(nombreUnico);

@@ -56,9 +56,9 @@ export const TareaController = {
     }
   },
 
-  async obtenerFinalizadasPorUsuario(req, res) {
+  async obtenerActivasPorUsuario(req, res) {
     try {
-      const tareas = await TareaService.obtenerTareaFinalizadaPorUsuario(req.params.usuarioId);
+      const tareas = await TareaService.obtenerTareaActivasPorUsuario(req.params.usuarioId);
       res.json(tareas);
     } catch (err) {
       res.status(500).json({ error: err.message });

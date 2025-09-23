@@ -1,8 +1,32 @@
 import { csevr_001Service } from "./csevr_001_service.js";
+import { imageService } from "../imagenes/imageService.js";
 
 export const csevr_001Controller = {
   async crear(req, res) {
     try {
+          let datosFormulario = req.body;
+          
+          // Si hay imagen en base64, procesarla
+          if (req.body.imagen_base64) {
+            console.log('Procesando imagen...');
+            
+            const imagenData = await imageService.subirImagen(
+              req.body.imagen_base64,
+              req.body.nombre_imagen || 'imagen.jpg',
+              cserv_001
+            );
+            
+            datosFormulario.imagen = {
+              url: imagenData.url,
+              nombre_archivo: imagenData.nombre_archivo,
+              tamaño: imagenData.tamaño,
+              tipo_mime: imagenData.tipo_mime
+            };
+            
+            // Limpiar el base64 del objeto (no guardarlo en BD)
+            delete datosFormulario.imagen_base64;
+            delete datosFormulario.nombre_imagen;
+          }
       const registro = await csevr_001Service.crearCsevr001(req.body);
       res.status(201).json(registro);
     } catch (error) {
