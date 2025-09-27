@@ -5,7 +5,7 @@ export const csevr_001Controller = {
   async crear(req, res) {
     try {
           let datosFormulario = req.body;
-          
+          console.log('Datos recibidos:', datosFormulario);
           // Si hay imagen en base64, procesarla
           if (req.body.imagen_base64) {
             console.log('Procesando imagen...');
@@ -17,7 +17,7 @@ export const csevr_001Controller = {
             );
             
             datosFormulario.imagen = {
-              url: imagenData.url,
+              url: imagenData.uri,
               nombre_archivo: imagenData.nombre_archivo,
               tamaño: imagenData.tamaño,
               tipo_mime: imagenData.tipo_mime

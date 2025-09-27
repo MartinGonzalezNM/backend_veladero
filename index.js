@@ -42,7 +42,7 @@ app.use("/api/roles", rolRoutes);
 app.use("/api/hh", hhroutes);
 app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
-app.use("/api/health", healthRoutes);
+app.use("/api/healthcheck", healthRoutes);
 app.use("/api/formulario/csevr-001", csevr_001Routes);
 app.use("/api/formulario/prueba", pruebaRoutes);
 
