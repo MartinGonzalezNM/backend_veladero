@@ -4,6 +4,7 @@ import { imageService } from "../imagenes/imageService.js";
 export const csevr_001Controller = {
   async crear(req, res) {
     try {
+          const carpeta = 'csevr_001';
           let datosFormulario = req.body;
           console.log('Datos recibidos:', datosFormulario);
           // Si hay imagen en base64, procesarla
@@ -13,12 +14,12 @@ export const csevr_001Controller = {
             const imagenData = await imageService.subirImagen(
               req.body.imagen_base64,
               req.body.nombre_imagen || 'imagen.jpg',
-              cserv_001
+              carpeta
             );
             
             datosFormulario.imagen = {
-              url: imagenData.uri,
-              nombre_archivo: imagenData.nombre_archivo,
+              url: imagenData.url,
+              nombre_imagen: imagenData.nombre_imagen ,
               tamaño: imagenData.tamaño,
               tipo_mime: imagenData.tipo_mime
             };
@@ -31,6 +32,7 @@ export const csevr_001Controller = {
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.error('Error en crear:', error);
     }
   },
 

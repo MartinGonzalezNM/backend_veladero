@@ -29,7 +29,7 @@ const csevr_001Schema = new mongoose.Schema({
   // Campo para una sola imagen
   imagen: {
     url: { type: String },
-    nombre_archivo: { type: String },
+    nombre_imagen: { type: String },
     fecha_subida: { type: Date, default: Date.now },
     tamaño: { type: Number }, // en bytes
     tipo_mime: { type: String }
