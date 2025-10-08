@@ -1,8 +1,12 @@
 import { csevr_001Model } from "./csevr_001_model.js";
+import { TareaService } from "../../tarea/tarea_service.js";
 
 export const csevr_001Service = {
   async crearCsevr001(data) {
     const nuevoRegistro = new csevr_001Model(data);
+    
+    //cambiar el estado de la tarea a 'completada'
+    await TareaService.finalizarTarea(data.id_tarea);
     return await nuevoRegistro.save();
   },
 

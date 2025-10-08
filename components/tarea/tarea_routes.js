@@ -14,4 +14,6 @@ router.get("/usuario/:usuarioId", verificarToken, TareaController.obtenerPorUsua
 
 router.get("/usuario/:usuarioId/activas", verificarToken, TareaController.obtenerActivasPorUsuario);
 
+router.patch("/:id/finalizar", verificarToken, TareaController.finalizarTarea);
+
 export default router;

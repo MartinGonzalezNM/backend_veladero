@@ -79,5 +79,15 @@ async obtenerTareaActivasPorUsuario(usuarioId) {
   .populate("id_sector", "nombre_sector")
   .populate("id_empresa", "nombre_empresa")
   .populate("responsable", "nombre_usuario email");
+},
+
+// cambiar estado de tarea a finalizada
+async finalizarTarea(id) {
+  return await TareaModel.findByIdAndUpdate(
+    id,
+    { estado: "finalizado", ultima_modificacion: new Date() },
+    { new: true }
+  );
+},
+
 }
-};

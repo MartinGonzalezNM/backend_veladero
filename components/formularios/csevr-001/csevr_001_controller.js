@@ -6,7 +6,7 @@ export const csevr_001Controller = {
     try {
           const carpeta = 'csevr_001';
           let datosFormulario = req.body;
-          console.log('Datos recibidos:', datosFormulario);
+          //console.log('Datos recibidos:', datosFormulario);
           // Si hay imagen en base64, procesarla
           if (req.body.imagen_base64) {
             console.log('Procesando imagen...');

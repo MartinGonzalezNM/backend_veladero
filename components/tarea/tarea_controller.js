@@ -63,6 +63,16 @@ export const TareaController = {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
+  },
+
+  async finalizarTarea(req, res) {
+    try {
+      const tarea = await TareaService.finalizarTarea(req.params.id);
+      if (!tarea) return res.status(404).json({ error: "Tarea no encontrada" });
+      res.json(tarea);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 
 };
