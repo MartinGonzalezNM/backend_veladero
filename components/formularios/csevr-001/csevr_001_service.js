@@ -25,6 +25,24 @@ export const csevr_001Service = {
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
   },
+  //obtener por id de tarea, llamar a la collection tareas
+  
+  async obtenerPorIdTarea(id_tarea) {
+    return await csevr_001Model.findOne({ id_tarea })
+      .populate({
+        path: "id_tarea",
+        populate: [
+          { path: "id_area", select: "nombre_area" },
+          { path: "id_sector", select: "nombre_sector" },
+          { path: "id_descripcion", select: "nombre_descripcion" },
+          { path: "id_item", select: "nombre_item" },
+          { path: "responsable", select: "nombre_usuario email" },
+        ]
+      })
+      .populate("firmas.supervisor", "nombre_usuario email")
+      .populate("firmas.supervisor_area", "nombre_usuario email")
+      .populate("firmas.brigada", "nombre_usuario email");
+  } ,
 
   async actualizar(id, data) {
     return await csevr_001Model.findByIdAndUpdate(id, data, { 
