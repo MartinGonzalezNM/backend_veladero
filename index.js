@@ -47,7 +47,7 @@ app.use("/api/formulario/csevr-001", csevr_001Routes);
 app.use("/api/formulario/prueba", pruebaRoutes);
 
 // Nueva ruta de firma
-app.use("/api/firma", firmaRoutes);
+//app.use("/api/firma", firmaRoutes);
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
