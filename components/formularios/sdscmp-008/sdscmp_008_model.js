@@ -39,7 +39,7 @@ const sdscmp_008Schema = new mongoose.Schema({
   },
 
   observaciones: { type: String, enum: ["SI", "NO"] },
-  nivel_riesgo: { type: String, enum: ["BAJO", "MEDIO", "ALTO"] },
+  observaciones_generales: { type: String },
 
   firmas: {
     supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },

@@ -36,14 +36,16 @@ const csevr_001Schema = new mongoose.Schema({
   },
 
   observaciones: { type: String, enum: ["SI", "NO"] },
-  nivel_riesgo: { type: String, enum: ["BAJO", "MEDIO", "ALTO"] },
+  observaciones_generales: { type: String },
 
  
   firmas: {
     supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },
     supervisor_area: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },
     brigada: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" }
-  }
+  },
+
+
 }, {
   timestamps: true
 });
