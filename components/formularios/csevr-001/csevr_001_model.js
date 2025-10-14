@@ -37,6 +37,7 @@ const csevr_001Schema = new mongoose.Schema({
 
   observaciones: { type: String, enum: ["SI", "NO"] },
   observaciones_generales: { type: String },
+  observacion_leida: { type: Boolean, default: false },
 
  
   firmas: {

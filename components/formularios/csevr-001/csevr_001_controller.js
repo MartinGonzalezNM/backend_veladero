@@ -110,6 +110,31 @@ export const csevr_001Controller = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  // NUEVA FUNCIÓN: Obtener formularios con observaciones pendientes de leer
+  async obtenerObservacionesPendientes(req, res) {
+    try {
+      const registros = await csevr_001Service.obtenerObservacionesPendientes();
+      res.json(registros);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // NUEVA FUNCIÓN: Marcar una observación como leída
+  async marcarObservacionLeida(req, res) {
+    try {
+      const registro = await csevr_001Service.marcarObservacionLeida(req.params.id);
+      if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
+      res.json({ 
+        message: "Observación marcada como leída correctamente",
+        registro 
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
 // ============================================
   // FUNCIÓN PARA EXPORTAR A EXCEL
   // ============================================
