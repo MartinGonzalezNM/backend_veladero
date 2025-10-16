@@ -111,6 +111,7 @@ export const csevr_001Controller = {
     }
   },
 
+/*
   // NUEVA FUNCIÓN: Obtener formularios con observaciones pendientes de leer
   async obtenerObservacionesPendientes(req, res) {
     try {
@@ -134,6 +135,7 @@ export const csevr_001Controller = {
       res.status(400).json({ error: error.message });
     }
   },
+*/
 
 // ============================================
   // FUNCIÓN PARA EXPORTAR A EXCEL

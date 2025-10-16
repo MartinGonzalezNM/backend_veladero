@@ -65,7 +65,7 @@ export const csevr_001Service = {
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
   },
-
+/*
   // NUEVA FUNCIÓN: Obtener formularios con observaciones = "SI" y observacion_leida = false
   async obtenerObservacionesPendientes() {
     return await csevr_001Model.find({
@@ -103,4 +103,7 @@ export const csevr_001Service = {
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
   }
+
+  */
 };
+

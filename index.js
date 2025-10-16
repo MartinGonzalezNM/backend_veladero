@@ -19,6 +19,7 @@ import healthRoutes from "./components/health/health_routes.js";
 import csevr_001Routes from "./components/formularios/csevr-001/csevr_001_routes.js";
 import sdscmp_008Routes from "./components/formularios/sdscmp-008/sdscmp_008_routes.js";
 import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
+import observacionesRoutes from "./components/formularios/observaciones/observaciones_routes.js";
 
 // Nueva ruta de firma
 //import firmaRoutes from "./components/firma/firma_Routes.js";
@@ -47,6 +48,10 @@ app.use("/api/healthcheck", healthRoutes);
 app.use("/api/formulario/csevr-001", csevr_001Routes);
 app.use("/api/formulario/sdscmp-008", sdscmp_008Routes);
 app.use("/api/formulario/prueba", pruebaRoutes);
+
+//observaciones
+app.use("/api/observaciones", observacionesRoutes);
+
 
 // Nueva ruta de firma
 //app.use("/api/firma", firmaRoutes);

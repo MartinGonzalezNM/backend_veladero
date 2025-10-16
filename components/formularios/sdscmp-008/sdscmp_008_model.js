@@ -40,6 +40,7 @@ const sdscmp_008Schema = new mongoose.Schema({
 
   observaciones: { type: String, enum: ["SI", "NO"] },
   observaciones_generales: { type: String },
+  observacion_leida: { type: Boolean, default: false },
 
   firmas: {
     supervisor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario" },
