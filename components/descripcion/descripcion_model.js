@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 
 const DescripcionSchema = new mongoose.Schema({
     nombre_descripcion: { type: String},
-    estado: { type: String, enum: ["activo", "inactivo"], default: "activo" }
+    estado: { type: String, enum: ["activo", "inactivo"], default: "activo" },
+    codigo_descripcion: { type: String}
 
 });
 

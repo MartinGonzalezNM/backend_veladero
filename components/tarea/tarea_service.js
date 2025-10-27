@@ -2,6 +2,7 @@ import { TareaModel } from "./tarea_model.js";
 
 export const TareaService = {
   async crearTarea(data) {
+    console.log("Creando tarea con datos:", data);
     const tarea = new TareaModel(data);
     return await tarea.save();
   },
@@ -43,7 +44,6 @@ async obtenerTareaActivasPorUsuario(usuarioId) {
     .populate("id_sector", "nombre_sector -_id")
     .populate("id_empresa", "nombre_empresa -_id")
     .populate("id_descripcion", "nombre_descripcion -_id")
-    .populate("id_item", "nombre_item -_id")
     .populate("responsable", "nombre_usuario email -_id");
 
   // Transformar para devolver un string en lugar de un objeto
@@ -54,6 +54,7 @@ async obtenerTareaActivasPorUsuario(usuarioId) {
     id_area: t.id_area?.nombre_area ?? null,
     id_sector: t.id_sector?.nombre_sector ?? null,
     id_empresa: t.id_empresa?.nombre_empresa ?? null,
+    id_item: t.id_item ? t.id_item : null,
     responsable: t.responsable ? { nombre_usuario: t.responsable.nombre_usuario, email: t.responsable.email } : null
   }));
 },
