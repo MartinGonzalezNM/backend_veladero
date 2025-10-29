@@ -5,6 +5,13 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import { corsOptions } from "./cors.js";
 
+// Importar rate limiters
+import { 
+  generalLimiter, 
+  uploadLimiter, 
+  observacionesLimiter 
+} from "./middleware/rateLimiters.js";
+
 // Importar rutas existentes
 import tareaRoutes from "./components/tarea/tarea_routes.js";
 import usuarioRoutes from "./components/usuario/usuario_routes.js";
@@ -22,20 +29,30 @@ import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
 import observacionesRoutes from "./components/formularios/observaciones/observaciones_routes.js";
 import imprevistoRoutes from "./components/formularios/imprevisto/imprevisto_routes.js";
 
-// Nueva ruta de firma
-//import firmaRoutes from "./components/firma/firma_Routes.js";
-
 // Configuración de variables de entorno
 dotenv.config();
 
 const app = express();
 
-// Middlewares
+// ========================================
+// MIDDLEWARES GLOBALES
+// ========================================
+
 app.use(cors(corsOptions));
-app.use(express.json());
+
+// Límite aumentado para soportar imágenes en base64
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(morgan("dev"));
 
-// Rutas
+// Rate limiter general para todas las rutas API
+app.use('/api/', generalLimiter);
+
+// ========================================
+// RUTAS NORMALES
+// ========================================
+
 app.use("/api/tareas", tareaRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/areas", areaRoutes);
@@ -46,47 +63,76 @@ app.use("/api/hh", hhroutes);
 app.use("/api/descripciones", descripcionRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/healthcheck", healthRoutes);
-app.use("/api/formulario/csevr-001", csevr_001Routes);
-app.use("/api/formulario/sdscmp-008", sdscmp_008Routes);
-app.use("/api/formulario/prueba", pruebaRoutes);
-app.use("/api/formulario/imprevisto", imprevistoRoutes);
 
-//observaciones
-app.use("/api/observaciones", observacionesRoutes);
+// ========================================
+// RUTAS CON RATE LIMITING ESPECÍFICO
+// ========================================
 
+// Formularios con imágenes - Rate limiting más estricto
+app.use("/api/formulario/csevr-001", uploadLimiter, csevr_001Routes);
+app.use("/api/formulario/sdscmp-008", uploadLimiter, sdscmp_008Routes);
+app.use("/api/formulario/prueba", uploadLimiter, pruebaRoutes);
+app.use("/api/formulario/imprevisto", uploadLimiter, imprevistoRoutes);
 
-// Nueva ruta de firma
-//app.use("/api/firma", firmaRoutes);
+// Observaciones - Rate limiting moderado
+app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);
 
-// Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-})
-.then(() => {
-  console.log("✅ Conectado a MongoDB Atlas");
-  app.listen(process.env.PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${process.env.PORT}`);
+// ========================================
+// RUTAS PÚBLICAS (fuera de /api)
+// ========================================
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'API Veladero - Sistema de Gestión',
+    version: '1.0.0',
+    status: 'running'
   });
-  
-  app.on('error', (err) => {
-    console.error("❌ Error en el servidor:", err.message);
-  });
-
-  app.get('/', (req, res) => {
-    res.send('API is running...');
-  });
-
-  // Agrega este endpoint a tu API para ver la IP del servidor
-  app.get('/api/ip', (req, res) => {
-    const serverIp = req.socket.localAddress;
-    const clientIp = req.ip || req.connection.remoteAddress;
-    res.json({ 
-      serverIp, 
-      clientIp,
-      headers: req.headers 
-    });
-  });
-
-})
-.catch((err) => {
-  console.error("❌ Error al conectar con MongoDB:", err.message);
 });
+
+app.get('/api/ip', (req, res) => {
+  const serverIp = req.socket.localAddress;
+  const clientIp = req.ip || req.connection.remoteAddress;
+  res.json({
+    serverIp,
+    clientIp,
+    headers: req.headers
+  });
+});
+
+// ========================================
+// MANEJO DE ERRORES 404
+// ========================================
+
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Ruta no encontrada',
+    path: req.path,
+    method: req.method
+  });
+});
+
+// ========================================
+// CONEXIÓN A MONGODB Y SERVIDOR
+// ========================================
+
+mongoose.connect(process.env.MONGODB_URI, {})
+  .then(() => {
+    console.log("✅ Conectado a MongoDB Atlas");
+    
+    app.listen(process.env.PORT, () => {
+      console.log(`🚀 Servidor corriendo en http://localhost:${process.env.PORT}`);
+      console.log(`📦 Límite de payload: 10MB`);
+      console.log(`🛡️  Protección DDoS activada:`);
+      console.log(`   - General: 200 req/15min`);
+      console.log(`   - Formularios: 50 req/15min`);
+      console.log(`   - Observaciones: 100 req/15min`);
+    });
+
+    app.on('error', (err) => {
+      console.error("❌ Error en el servidor:", err.message);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Error al conectar con MongoDB:", err.message);
+    process.exit(1); // Salir si no hay conexión a DB
+  });
