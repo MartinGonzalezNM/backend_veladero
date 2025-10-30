@@ -3,14 +3,16 @@ import mongoose from "mongoose";
 const imprevistoSchema = new mongoose.Schema({
   codigo_formulario: { type: String, default: "imp-01" },
   nombre_formulario: { type: String, default: "IMPREVISTO" },
-
   fecha_inspeccion: { type: Date, default: Date.now },
-  sector: { type: String },
-  hh: { type: String },
+
+  ubicacion: { type: String },
+  sistema_afectado: { type: String },
+  componente_afectado: { type: String },
+  detalle_tarea: { type: String },
   participantes: { type: String },
-  resumen_tareas: { type: String },
-  descripcion_tarea: { type: String },
-  tipo: { type: String },
+  hh: { type: String },
+  tipo: { type: String, enum: ["emergencia", "urgencia"] },
+
 
 
   // Campo para una sola imagen

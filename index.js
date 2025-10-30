@@ -72,7 +72,7 @@ app.use("/api/healthcheck", healthRoutes);
 app.use("/api/formulario/csevr-001", uploadLimiter, csevr_001Routes);
 app.use("/api/formulario/sdscmp-008", uploadLimiter, sdscmp_008Routes);
 app.use("/api/formulario/prueba", uploadLimiter, pruebaRoutes);
-app.use("/api/formulario/imprevisto", uploadLimiter, imprevistoRoutes);
+app.use("/api/formulario/imp-01", uploadLimiter, imprevistoRoutes);
 
 // Observaciones - Rate limiting moderado
 app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);

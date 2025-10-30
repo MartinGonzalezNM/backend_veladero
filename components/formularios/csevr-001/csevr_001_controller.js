@@ -1,35 +1,15 @@
 import { csevr_001Service } from "./csevr_001_service.js";
 import { imageService } from "../imagenes/imageService.js";
 import ExcelJS from "exceljs";
+import { procesarImagenBase64 } from "../imagenes/imageProcessor.js";
 
 export const csevr_001Controller = {
   async crear(req, res) {
     try {
-          const carpeta = 'csevr_001';
-          let datosFormulario = req.body;
-          //console.log('Datos recibidos:', datosFormulario);
-          // Si hay imagen en base64, procesarla
-          if (req.body.imagen_base64) {
-            console.log('Procesando imagen...');
-            
-            const imagenData = await imageService.subirImagen(
-              req.body.imagen_base64,
-              req.body.nombre_imagen || 'imagen.jpg',
-              carpeta
-            );
-            
-            datosFormulario.imagen = {
-              url: imagenData.url,
-              nombre_imagen: imagenData.nombre_imagen ,
-              tamaño: imagenData.tamaño,
-              tipo_mime: imagenData.tipo_mime
-            };
-            
-            // Limpiar el base64 del objeto (no guardarlo en BD)
-            delete datosFormulario.imagen_base64;
-            delete datosFormulario.nombre_imagen;
-          }
-      const registro = await csevr_001Service.crearCsevr001(req.body);
+      const carpeta = 'csevr_001';
+      let datosFormulario = await procesarImagenBase64(req.body, carpeta);
+      
+      const registro = await csevr_001Service.crearCsevr001(datosFormulario);
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });

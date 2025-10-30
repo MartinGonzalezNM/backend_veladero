@@ -1,36 +1,15 @@
 import { sdscmp_008Service } from "./sdscmp_008_service.js";
 import { imageService } from "../imagenes/imageService.js";
 import ExcelJS from "exceljs";
+import { procesarImagenBase64 } from "../imagenes/imageProcessor.js";
 
 export const sdscmp_008Controller = {
   async crear(req, res) {
     try {
       const carpeta = 'sdscmp_008';
-      let datosFormulario = req.body;
+      let datosFormulario = await procesarImagenBase64(req.body, carpeta);
       
-      // Si hay imagen en base64, procesarla
-      if (req.body.imagen_base64) {
-        console.log('Procesando imagen...');
-        
-        const imagenData = await imageService.subirImagen(
-          req.body.imagen_base64,
-          req.body.nombre_imagen || 'imagen.jpg',
-          carpeta
-        );
-        
-        datosFormulario.imagen = {
-          url: imagenData.url,
-          nombre_imagen: imagenData.nombre_imagen,
-          tamaño: imagenData.tamaño,
-          tipo_mime: imagenData.tipo_mime
-        };
-        
-        // Limpiar el base64 del objeto (no guardarlo en BD)
-        delete datosFormulario.imagen_base64;
-        delete datosFormulario.nombre_imagen;
-      }
-      
-      const registro = await sdscmp_008Service.crearSdscmp008(req.body);
+      const registro = await sdscmp_008Service.crearSdscmp008(datosFormulario);
       res.status(201).json(registro);
     } catch (error) {
       res.status(400).json({ error: error.message });
