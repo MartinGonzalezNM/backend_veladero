@@ -1,6 +1,7 @@
 import { imprevistoService } from "./imprevisto_service.js";
 import { imageService } from "../imagenes/imageService.js";
 import { procesarImagenBase64 } from "../imagenes/imageProcessor.js";
+import ExcelJS from "exceljs";
 
 export const imprevistoController = {
   async crear(req, res) {
@@ -122,5 +123,432 @@ export const imprevistoController = {
     }
   },
 
+  // Función simplificada para exportar formulario de imprevisto a Excel
+async exportarImprevistoExcel(req, res) {
+  try {
+    const { id } = req.params;
+    
+    // Obtener el imprevisto con todos los datos
+    const imprevisto = await imprevistoService.obtenerPorId(id);
+    
+    if (!imprevisto) {
+      return res.status(404).json({ error: "Formulario no encontrado" });
+    }
+
+    // Crear nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('IMP-01');
+
+    // Configurar ancho de columnas
+    worksheet.columns = [
+      { width: 25 },  // Columna A
+      { width: 35 },  // Columna B
+      { width: 20 },  // Columna C
+      { width: 20 },  // Columna D
+    ];
+
+    let currentRow = 1;
+    
+    // ============================================
+    // ENCABEZADO
+    // ============================================
+    worksheet.mergeCells('A1:B2');
+    const logoCell = worksheet.getCell('A1');
+    logoCell.value = 'CHICONI S.R.L';
+    logoCell.font = { bold: true, size: 16 };
+    logoCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    logoCell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.mergeCells('C1:D1');
+    const titleCell = worksheet.getCell('C1');
+    titleCell.value = 'REPORTE DE SERVICIO';
+    titleCell.font = { bold: true, size: 14 };
+    titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    titleCell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell('C2').value = 'N°. CERRADA';
+    worksheet.getCell('C2').font = { bold: true, size: 10 };
+    worksheet.getCell('C2').alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell('C2').border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell('D2').value = '';
+    worksheet.getCell('D2').border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getRow(1).height = 25;
+    worksheet.getRow(2).height = 20;
+
+    currentRow = 3;
+
+    // ============================================
+    // INFORMACIÓN GENERAL
+    // ============================================
+    worksheet.mergeCells(`A${currentRow}:B${currentRow}`);
+    worksheet.getCell(`A${currentRow}`).value = 'MANTENIMIENTO S.C.I';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, size: 10 };
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`C${currentRow}`).value = 'FECHA';
+    worksheet.getCell(`C${currentRow}`).font = { bold: true, size: 10 };
+    worksheet.getCell(`C${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`C${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`C${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`D${currentRow}`).value = 'TIPO';
+    worksheet.getCell(`D${currentRow}`).font = { bold: true, size: 10 };
+    worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`D${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    // UBICACIÓN
+    worksheet.getCell(`A${currentRow}`).value = 'UBICACIÓN';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`B${currentRow}`).value = imprevisto.ubicacion || '';
+    worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`B${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    const fechaInspeccion = new Date(imprevisto.fecha_inspeccion);
+    worksheet.getCell(`C${currentRow}`).value = fechaInspeccion.toLocaleDateString('es-ES');
+    worksheet.getCell(`C${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`C${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`D${currentRow}`).value = (imprevisto.tipo || '').toUpperCase();
+    worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${currentRow}`).font = { bold: true, size: 10 };
+    worksheet.getCell(`D${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    // ============================================
+    // SISTEMA Y COMPONENTE
+    // ============================================
+    worksheet.getCell(`A${currentRow}`).value = 'SISTEMA AFECTADO';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.mergeCells(`B${currentRow}:D${currentRow}`);
+    worksheet.getCell(`B${currentRow}`).value = 'COMPONENTE AFECTADO - REEMPLAZADO';
+    worksheet.getCell(`B${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`B${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`B${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    worksheet.getCell(`A${currentRow}`).value = imprevisto.sistema_afectado || '';
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.mergeCells(`B${currentRow}:D${currentRow}`);
+    worksheet.getCell(`B${currentRow}`).value = imprevisto.componente_afectado || '';
+    worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`B${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    // ============================================
+    // DETALLE DE TRABAJOS
+    // ============================================
+    worksheet.mergeCells(`A${currentRow}:B${currentRow}`);
+    worksheet.getCell(`A${currentRow}`).value = 'DETALLE DE LOS TRABAJOS REALIZADOS';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, size: 10 };
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`C${currentRow}`).value = 'TÉCNICOS';
+    worksheet.getCell(`C${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`C${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`C${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`C${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`D${currentRow}`).value = 'HH';
+    worksheet.getCell(`D${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD3D3D3' }
+    };
+    worksheet.getCell(`D${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    // Calcular cuántas filas necesitamos
+    const participantes = imprevisto.participantes ? imprevisto.participantes.split(',') : [];
+    const numFilas = Math.max(5, participantes.length);
+
+    // Área de detalle
+    worksheet.mergeCells(`A${currentRow}:B${currentRow + numFilas - 1}`);
+    const detalleCell = worksheet.getCell(`A${currentRow}`);
+    detalleCell.value = imprevisto.detalle_tarea || '';
+    detalleCell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
+    detalleCell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    // Participantes y HH
+    for (let i = 0; i < numFilas; i++) {
+      worksheet.getCell(`C${currentRow + i}`).value = participantes[i]?.trim() || '';
+      worksheet.getCell(`C${currentRow + i}`).alignment = { horizontal: 'center', vertical: 'middle' };
+      worksheet.getCell(`C${currentRow + i}`).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+
+      // HH solo en la primera fila
+      worksheet.getCell(`D${currentRow + i}`).value = i === 0 ? (imprevisto.hh || '') : '';
+      worksheet.getCell(`D${currentRow + i}`).alignment = { horizontal: 'center', vertical: 'middle' };
+      worksheet.getCell(`D${currentRow + i}`).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+    }
+
+    currentRow += numFilas;
+    currentRow++;
+
+    // ============================================
+    // FIRMAS
+    // ============================================
+    worksheet.getCell(`A${currentRow}`).value = "V°B° TEC. ENCARGADO";
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
+    worksheet.getCell(`B${currentRow}`).value = "V°B° SUPERVISOR MTTO.";
+    worksheet.getCell(`B${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`B${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    worksheet.getCell(`B${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet.getCell(`D${currentRow}`).value = "V°B° PLANIFICADOR";
+    worksheet.getCell(`D${currentRow}`).font = { bold: true, size: 9 };
+    worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${currentRow}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    worksheet.getCell(`D${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    currentRow++;
+
+    // Espacio para firmas
+    worksheet.getCell(`A${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
+    worksheet.getCell(`B${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet.getCell(`D${currentRow}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet.getRow(currentRow).height = 40;
+
+    currentRow++;
+
+    // Nombres de firmantes
+    worksheet.getCell(`A${currentRow}`).value = imprevisto.firmas?.supervisor || '';
+    worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`A${currentRow}`).font = { size: 9 };
+
+    worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
+    worksheet.getCell(`B${currentRow}`).value = imprevisto.firmas?.supervisor_area || '';
+    worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`B${currentRow}`).font = { size: 9 };
+
+    worksheet.getCell(`D${currentRow}`).value = imprevisto.firmas?.brigada || '';
+    worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${currentRow}`).font = { size: 9 };
+
+    // ============================================
+    // GENERAR Y ENVIAR ARCHIVO
+    // ============================================
+    const buffer = await workbook.xlsx.writeBuffer();
+    
+    const filename = `IMP-01_${imprevisto.ubicacion || 'imprevisto'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Error al generar Excel:', error);
+    res.status(500).json({ error: 'Error al generar el archivo Excel' });
+  }
+}
+
+// ============================================
+// AGREGAR EN EL ROUTER (SIN AUTENTICACIÓN)
+// ============================================
+// router.get('/:id/excel', imprevistoController.exportarImprevistoExcel);
 
 };

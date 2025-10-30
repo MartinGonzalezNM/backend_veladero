@@ -13,4 +13,6 @@ router.get("/", imprevistoController.obtenerTodos);
 router.get("/:id", imprevistoController.obtenerPorId);
 router.delete("/:id", imprevistoController.eliminar);
 
+router.get('/:id/excel', imprevistoController.exportarImprevistoExcel);
+
 export default router;
