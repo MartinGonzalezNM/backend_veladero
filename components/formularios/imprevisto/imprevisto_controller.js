@@ -9,7 +9,6 @@ export const imprevistoController = {
       let datosFormulario = req.body;
       const carpeta = 'imprevisto';
 
-
       // Procesar imagen en base64
       datosFormulario = await procesarImagenBase64(datosFormulario, carpeta);
       const registro = await imprevistoService.crearImprevisto(datosFormulario);
@@ -48,7 +47,7 @@ export const imprevistoController = {
         console.log('Procesando imagen nueva...');
         
         // Obtener registro actual para eliminar imagen anterior si existe
-        const registroActual = await pruebaService.obtenerPorId(req.params.id);
+        const registroActual = await imprevistoService.obtenerPorId(req.params.id);
         if (registroActual?.imagen?.nombre_archivo) {
           await imageService.eliminarImagen(registroActual.imagen.nombre_archivo);
         }
@@ -122,6 +121,145 @@ export const imprevistoController = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  // ⭐ NUEVA FUNCIÓN PARA OBTENER IMPREVISTOS PARA REPORTE
+  async obtenerParaReporte(req, res) {
+    try {
+      const { fechaInicio, fechaFin } = req.query;
+
+      if (!fechaInicio || !fechaFin) {
+        return res.status(400).json({ 
+          error: 'Se requieren las fechas de inicio y fin' 
+        });
+      }
+
+      const imprevistos = await imprevistoService.obtenerPorRangoFechas(fechaInicio, fechaFin);
+      
+      res.json(imprevistos);
+    } catch (error) {
+      console.error('Error al obtener imprevistos para reporte:', error);
+      res.status(500).json({ 
+        error: 'Error al obtener imprevistos',
+        detalle: error.message 
+      });
+    }
+  },
+
+  // ⭐ NUEVA FUNCIÓN PARA EXPORTAR IMPREVISTO INDIVIDUAL A EXCEL
+  async exportarImprevistoExcel(req, res) {
+    try {
+      const { id } = req.params;
+      
+      const imprevisto = await imprevistoService.obtenerPorId(id);
+      if (!imprevisto) {
+        return res.status(404).json({ error: "Imprevisto no encontrado" });
+      }
+
+      // Crear workbook
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Imprevisto');
+
+      // Configurar título
+      worksheet.mergeCells('A1:D1');
+      const tituloCell = worksheet.getCell('A1');
+      tituloCell.value = 'REPORTE DE IMPREVISTO';
+      tituloCell.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
+      tituloCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFDC3545' } // Rojo para imprevistos
+      };
+      tituloCell.alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getRow(1).height = 30;
+
+      // Información general
+      let rowNum = 3;
+      
+      const agregarCampo = (label, value) => {
+        worksheet.getCell(`A${rowNum}`).value = label;
+        worksheet.getCell(`A${rowNum}`).font = { bold: true };
+        worksheet.getCell(`A${rowNum}`).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFF0F0F0' }
+        };
+        worksheet.mergeCells(`B${rowNum}:D${rowNum}`);
+        worksheet.getCell(`B${rowNum}`).value = value || 'N/A';
+        rowNum++;
+      };
+
+      agregarCampo('Código:', imprevisto.codigo_formulario);
+      agregarCampo('Tipo:', imprevisto.tipo.toUpperCase());
+      agregarCampo('Fecha Inspección:', new Date(imprevisto.fecha_inspeccion).toLocaleDateString('es-ES'));
+      
+      rowNum++; // Espacio
+      
+      agregarCampo('Ubicación:', imprevisto.ubicacion);
+      agregarCampo('Sistema Afectado:', imprevisto.sistema_afectado);
+      agregarCampo('Componente Afectado:', imprevisto.componente_afectado);
+      
+      rowNum++; // Espacio
+      
+      agregarCampo('Detalle de la Tarea:', imprevisto.detalle_tarea);
+      agregarCampo('Participantes:', imprevisto.participantes);
+      agregarCampo('Horas Hombre (HH):', imprevisto.hh);
+      
+      rowNum++; // Espacio
+      
+      // Firmas
+      worksheet.mergeCells(`A${rowNum}:D${rowNum}`);
+      worksheet.getCell(`A${rowNum}`).value = 'FIRMAS';
+      worksheet.getCell(`A${rowNum}`).font = { bold: true, size: 12 };
+      worksheet.getCell(`A${rowNum}`).alignment = { horizontal: 'center' };
+      rowNum++;
+      
+      agregarCampo('Supervisor:', imprevisto.firmas?.supervisor ? 'Firmado' : 'Pendiente');
+      agregarCampo('Supervisor de Área:', imprevisto.firmas?.supervisor_area ? 'Firmado' : 'Pendiente');
+      agregarCampo('Brigada:', imprevisto.firmas?.brigada ? 'Firmado' : 'Pendiente');
+
+      // Ajustar anchos de columnas
+      worksheet.getColumn('A').width = 25;
+      worksheet.getColumn('B').width = 20;
+      worksheet.getColumn('C').width = 20;
+      worksheet.getColumn('D').width = 20;
+
+      // Aplicar bordes a todas las celdas con contenido
+      for (let i = 1; i <= rowNum; i++) {
+        ['A', 'B', 'C', 'D'].forEach(col => {
+          const cell = worksheet.getCell(`${col}${i}`);
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+        });
+      }
+
+      // Configurar respuesta
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=imprevisto_${imprevisto.codigo_formulario}.xlsx`
+      );
+
+      // Enviar archivo
+      await workbook.xlsx.write(res);
+      res.end();
+
+    } catch (error) {
+      console.error('Error al exportar imprevisto a Excel:', error);
+      res.status(500).json({ 
+        error: 'Error al generar el archivo Excel',
+        detalle: error.message 
+      });
+    }
+  },
+
+
 
   // Función simplificada para exportar formulario de imprevisto a Excel
 async exportarImprevistoExcel(req, res) {

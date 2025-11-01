@@ -28,6 +28,11 @@ import sdscmp_008Routes from "./components/formularios/sdscmp-008/sdscmp_008_rou
 import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
 import observacionesRoutes from "./components/formularios/observaciones/observaciones_routes.js";
 import imprevistoRoutes from "./components/formularios/imprevisto/imprevisto_routes.js";
+import reporteRoutes from './components/reportes/reporteRoutes.js';
+
+
+
+
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -76,6 +81,9 @@ app.use("/api/formulario/imp-01", uploadLimiter, imprevistoRoutes);
 
 // Observaciones - Rate limiting moderado
 app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);
+
+//Reportes
+app.use('/api/reportes', reporteRoutes);
 
 // ========================================
 // RUTAS PÚBLICAS (fuera de /api)
