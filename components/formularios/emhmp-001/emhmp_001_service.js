@@ -1,17 +1,17 @@
-import { sdscmp_008Model } from "./sdscmp_008_model.js";
+import { emhmp_001Model } from "./emhmp_001_model.js";
 import { TareaService } from "../../tarea/tarea_service.js";
 
-export const sdscmp_008Service = {
-  async crearSdscmp008(data) {
-    const nuevoRegistro = new sdscmp_008Model(data);
+export const emhmp_001Service = {
+  async crearEmhmp001(data) {
+    const nuevoRegistro = new emhmp_001Model(data);
     
-    //cambiar el estado de la tarea a 'completada'
+    // Cambiar el estado de la tarea a 'completada'
     await TareaService.finalizarTarea(data.id_tarea);
     return await nuevoRegistro.save();
   },
 
   async obtenerTodos() {
-    return await sdscmp_008Model.find()
+    return await emhmp_001Model.find()
       .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
@@ -19,18 +19,15 @@ export const sdscmp_008Service = {
   },
 
   async obtenerPorId(id) {
-    return await sdscmp_008Model.findById(id)
+    return await emhmp_001Model.findById(id)
       .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
       .populate("firmas.brigada");
   },
 
- //elimine obtener por id de tarea, llamar a la collection tareas, creo que no se usaba
-
-
   async actualizar(id, data) {
-    return await sdscmp_008Model.findByIdAndUpdate(id, data, { 
+    return await emhmp_001Model.findByIdAndUpdate(id, data, { 
       new: true,
       runValidators: true 
     }).populate("id_tarea")
@@ -40,8 +37,6 @@ export const sdscmp_008Service = {
   },
 
   async eliminar(id) {
-    return await sdscmp_008Model.findByIdAndDelete(id);
-  },
-
-   //elimine obtener por filtros creo que no se usaba
+    return await emhmp_001Model.findByIdAndDelete(id);
+  }
 };

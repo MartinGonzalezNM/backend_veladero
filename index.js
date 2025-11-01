@@ -28,6 +28,7 @@ import sdscmp_008Routes from "./components/formularios/sdscmp-008/sdscmp_008_rou
 import pruebaRoutes from "./components/formularios/prueba/prueba_routes.js";
 import observacionesRoutes from "./components/formularios/observaciones/observaciones_routes.js";
 import imprevistoRoutes from "./components/formularios/imprevisto/imprevisto_routes.js";
+import emhmp_001Routes from "./components/formularios/emhmp-001/emhmp_001_routes.js";
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -73,6 +74,7 @@ app.use("/api/formulario/csevr-001", uploadLimiter, csevr_001Routes);
 app.use("/api/formulario/sdscmp-008", uploadLimiter, sdscmp_008Routes);
 app.use("/api/formulario/prueba", uploadLimiter, pruebaRoutes);
 app.use("/api/formulario/imp-01", uploadLimiter, imprevistoRoutes);
+app.use("/api/formulario/emhmp-001", uploadLimiter, emhmp_001Routes);
 
 // Observaciones - Rate limiting moderado
 app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);

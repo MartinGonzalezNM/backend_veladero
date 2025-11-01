@@ -36,16 +36,8 @@ export const sdscmp_008Controller = {
     }
   },
   
-  async obtenerPorIdTarea(req, res) {
-    try {
-      const registro = await sdscmp_008Service.obtenerPorIdTarea(req.params.id);
-      if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
-      res.json(registro);
-      console.log('Registro encontrado:', registro);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+  //elimine obtener por id de tarea, llamar a la collection tareas, creo que no se usaba
+
 
   async actualizar(req, res) {
     try {
@@ -67,28 +59,8 @@ export const sdscmp_008Controller = {
     }
   },
 
-  async obtenerPorFiltros(req, res) {
-    try {
-      const { id_area, id_sector, id_empresa, fecha_inicio, fecha_fin } = req.query;
-      
-      const filtros = {};
-      
-      if (id_area) filtros.id_area = id_area;
-      if (id_sector) filtros.id_sector = id_sector;
-      if (id_empresa) filtros.id_empresa = id_empresa;
-      
-      if (fecha_inicio || fecha_fin) {
-        filtros.fecha_inspeccion = {};
-        if (fecha_inicio) filtros.fecha_inspeccion.$gte = new Date(fecha_inicio);
-        if (fecha_fin) filtros.fecha_inspeccion.$lte = new Date(fecha_fin);
-      }
+  //elimine obtener por filtros creo que no se usaba
 
-      const registros = await sdscmp_008Service.obtenerPorFiltros(filtros);
-      res.json(registros);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
 
   // ============================================
   // FUNCIÓN PARA EXPORTAR A EXCEL
