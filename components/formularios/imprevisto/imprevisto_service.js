@@ -7,11 +7,11 @@ export const imprevistoService = {
   },
 
   async obtenerTodos() {
-    return await imprevistoModel.find()
+    return await imprevistoModel.find().sort({ fecha_inspeccion: -1 });
   },
 
   async obtenerPorId(id) {
-    return await imprevistoModel.findById(id)
+    return await imprevistoModel.findById(id);
   },
 
   async actualizar(id, data) {
@@ -25,6 +25,26 @@ export const imprevistoService = {
     return await imprevistoModel.findByIdAndDelete(id);
   },
 
+ // ⭐ NUEVA FUNCIÓN PARA REPORTES
+  async obtenerPorRangoFechas(fechaInicio, fechaFin) {
+    try {
+      const imprevistos = await imprevistoModel
+        .find({
+          fecha_inspeccion: {
+            $gte: new Date(fechaInicio),
+            $lte: new Date(fechaFin)
+          }
+        })
+        .sort({ fecha_inspeccion: 1 });
 
+      return imprevistos;
+    } catch (error) {
+      throw new Error(`Error al obtener imprevistos para reporte: ${error.message}`);
+    }
+  }
+};
 
+// ⭐ EXPORTACIÓN ADICIONAL (AGREGAR ESTO AL FINAL)
+export const obtenerImprevistosParaReporte = async (fechaInicio, fechaFin) => {
+  return await imprevistoService.obtenerPorRangoFechas(fechaInicio, fechaFin);
 };

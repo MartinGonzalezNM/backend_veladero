@@ -1,5 +1,6 @@
 import { TareaModel } from "./tarea_model.js";
 
+
 export const TareaService = {
   async crearTarea(data) {
     console.log("Creando tarea con datos:", data);
@@ -92,3 +93,24 @@ async finalizarTarea(id) {
 },
 
 }
+
+
+export const obtenerTareasParaReporte = async (fechaInicio, fechaFin) => {
+  try {
+    const tareas = await TareaModel
+      .find({
+        id_fecha_estimada_plan: {
+          $gte: new Date(fechaInicio),
+          $lte: new Date(fechaFin)
+        }
+      })
+      .populate('id_sector', 'nombre_sector')
+      .populate('id_descripcion', 'nombre_descripcion')
+      .populate('responsable', 'nombre_usuario')
+      .sort({ id_fecha_estimada_plan: 1 });
+
+    return tareas;
+  } catch (error) {
+    throw new Error(`Error al obtener tareas para reporte: ${error.message}`);
+  }
+};

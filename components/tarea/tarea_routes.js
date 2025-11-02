@@ -16,4 +16,7 @@ router.get("/usuario/:usuarioId/activas", verificarToken, TareaController.obtene
 
 router.patch("/:id/finalizar", verificarToken, TareaController.finalizarTarea);
 
+// ⭐ NUEVA RUTA PARA REPORTES
+router.get("/reporte/rango-fechas", verificarToken, TareaController.obtenerParaReporte);
+
 export default router;
