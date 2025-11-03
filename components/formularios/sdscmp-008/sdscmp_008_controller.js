@@ -36,8 +36,17 @@ export const sdscmp_008Controller = {
     }
   },
   
-  //elimine obtener por id de tarea, llamar a la collection tareas, creo que no se usaba
 
+  async obtenerPorIdTarea(req, res) {
+    try {
+      const registro = await sdscmp_008Service.obtenerPorIdTarea(req.params.id);
+      if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
+      res.json(registro);
+      console.log('Registro encontrado:', registro);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
   async actualizar(req, res) {
     try {

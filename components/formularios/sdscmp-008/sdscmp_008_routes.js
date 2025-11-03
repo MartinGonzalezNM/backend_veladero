@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/", sdscmp_008Controller.crear);
 router.get("/", sdscmp_008Controller.obtenerTodos);
 router.get("/:id", sdscmp_008Controller.obtenerPorId);
+router.get("/tarea/:id", sdscmp_008Controller.obtenerPorIdTarea);
 router.put("/:id", sdscmp_008Controller.actualizar);
 router.delete("/:id", sdscmp_008Controller.eliminar);
 
