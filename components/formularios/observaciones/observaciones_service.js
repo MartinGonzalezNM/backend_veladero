@@ -1,10 +1,12 @@
 import { csevr_001Model } from "../csevr-001/csevr_001_model.js";
 import { sdscmp_008Model } from "../sdscmp-008/sdscmp_008_model.js";
+import { emhmp_001Model } from "../emhmp-001/emhmp_001_model.js";
 
 // Registro de todos los modelos de formularios
 const MODELOS_FORMULARIOS = {
   csevr_001: csevr_001Model,
   sdscmp_008: sdscmp_008Model,
+  emhmp_001: emhmp_001Model,
   // Aquí irás agregando los demás formularios conforme los necesites
 };
 

@@ -92,6 +92,7 @@ const emhmp_001Schema = new mongoose.Schema({
     numero_hidrante: { type: String } // Para asociar imagen a hidrante específico
   }],
 
+  observaciones: { type: String, enum: ["SI", "NO"] },
   observaciones_generales: { type: String },
   observacion_leida: { type: Boolean, default: false },
 
