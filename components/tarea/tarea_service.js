@@ -23,7 +23,8 @@ export const TareaService = {
       .populate("id_area")
       .populate("id_sector")
       .populate("id_empresa")
-      .populate("responsable", "nombre_usuario email");
+      .populate("responsable", "nombre_usuario email")
+      .populate("creada_por", "nombre_usuario email");
   },
 
 
