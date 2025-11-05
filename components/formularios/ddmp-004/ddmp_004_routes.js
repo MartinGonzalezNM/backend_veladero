@@ -10,5 +10,6 @@ router.get("/", verificarToken, ddmp_004Controller.obtenerTodos);
 router.get("/:id", verificarToken, ddmp_004Controller.obtenerPorId);
 router.put("/:id", verificarToken, ddmp_004Controller.actualizar);
 router.delete("/:id", verificarToken, ddmp_004Controller.eliminar);
+router.get("/tarea/:id", ddmp_004Controller.obtenerPorIdTarea);
 
 export default router;

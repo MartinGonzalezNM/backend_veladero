@@ -52,5 +52,16 @@ export const ddmp_004Controller = {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
+
+    async obtenerPorIdTarea(req, res) {
+      try {
+        const registro = await ddmp_004Service.obtenerPorIdTarea(req.params.id);
+        if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
+        res.json(registro);
+        console.log('Registro encontrado:', registro);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    },
 };
