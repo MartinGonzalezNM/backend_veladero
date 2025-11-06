@@ -31,7 +31,7 @@ import imprevistoRoutes from "./components/formularios/imprevisto/imprevisto_rou
 import emhmp_001Routes from "./components/formularios/emhmp-001/emhmp_001_routes.js";
 import reporteRoutes from './components/reportes/reporteRoutes.js';
 import ddmp_004Routes from "./components/formularios/ddmp-004/ddmp_004_routes.js";
-
+import empmp_002Routes from "./components/formularios/empmp-002/empmp_002_routes.js";
 
 
 
@@ -82,6 +82,7 @@ app.use("/api/formulario/prueba", uploadLimiter, pruebaRoutes);
 app.use("/api/formulario/imp-01", uploadLimiter, imprevistoRoutes);
 app.use("/api/formulario/emhmp-001", uploadLimiter, emhmp_001Routes);
 app.use("/api/formulario/ddmp-004", uploadLimiter, ddmp_004Routes);
+app.use("/api/formulario/empmp-002", uploadLimiter, empmp_002Routes);
 
 // Observaciones - Rate limiting moderado
 app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);
