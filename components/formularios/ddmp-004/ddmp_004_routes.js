@@ -11,5 +11,7 @@ router.get("/:id", verificarToken, ddmp_004Controller.obtenerPorId);
 router.put("/:id", verificarToken, ddmp_004Controller.actualizar);
 router.delete("/:id", verificarToken, ddmp_004Controller.eliminar);
 router.get("/tarea/:id", ddmp_004Controller.obtenerPorIdTarea);
+// Ruta para exportar a Excel
+router.get("/tarea/:id/excel", verificarToken, ddmp_004Controller.exportarExcel);
 
 export default router;

@@ -2,8 +2,15 @@ import { csevr_001Service } from "./csevr_001_service.js";
 import { imageService } from "../imagenes/imageService.js";
 import ExcelJS from "exceljs";
 import { procesarImagenBase64 } from "../imagenes/imageProcessor.js";
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
+// Para obtener __dirname en ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const csevr_001Controller = {
+
   async crear(req, res) {
     try {
       const carpeta = 'csevr_001';
@@ -97,9 +104,10 @@ export const csevr_001Controller = {
 */
 
 // ============================================
-  // FUNCIÓN PARA EXPORTAR A EXCEL
-  // ============================================
-  async exportarExcel(req, res) {
+// FUNCIÓN PARA EXPORTAR A EXCEL CON LOGO
+// ============================================
+
+async exportarExcel(req, res) {
   try {
     const { id } = req.params;
     
@@ -116,36 +124,88 @@ export const csevr_001Controller = {
 
     // Configurar ancho de columnas
     worksheet.columns = [
-      { width: 40 },  // Columna A
-      { width: 20 },  // Columna B
-      { width: 40 },  // Columna C
+      { width: 15 },  // Columna A (para logo)
+      { width: 40 },  // Columna B
+      { width: 20 },  // Columna C
+      { width: 40 },  // Columna D
     ];
 
     // ============================================
-    // ENCABEZADO
+    // AGREGAR LOGO
     // ============================================
-    worksheet.mergeCells('A1:C1');
-    const titleCell = worksheet.getCell('A1');
-    titleCell.value = 'CONTROL DE SPRINKLER- CSEVR-001';
-    titleCell.font = { bold: true, size: 14 };
-    titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    titleCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFD3D3D3' }
-    };
-    titleCell.border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' },
-      bottom: { style: 'thin' }
-    };
-    worksheet.getRow(1).height = 25;
+try {
+  // Ruta al logo (desde el controlador hacia la carpeta logo)
+  const logoPath = path.join(__dirname, '..', '..', 'logo', 'LogoChiconi.webp');
+  
+  console.log('Buscando logo en:', logoPath); // Para debug
+  
+  // Verificar si el archivo existe
+  if (fs.existsSync(logoPath)) {
+    // Leer el archivo como buffer
+    const logoBuffer = fs.readFileSync(logoPath);
+    
+    // Agregar imagen al workbook
+    const logoId = workbook.addImage({
+      buffer: logoBuffer,
+      extension: 'png', // ExcelJS maneja webp como png
+    });
+
+    // Insertar logo en las celdas C1:D3 (DERECHA)
+    worksheet.addImage(logoId, {
+      tl: { col: 2, row: 0 }, // Top-left: columna C, fila 1
+      br: { col: 4, row: 3 }, // Bottom-right: columna E, fila 4
+      editAs: 'oneCell'
+    });
+    
+    console.log('✅ Logo agregado exitosamente');
+  } else {
+    console.warn('⚠️ Logo no encontrado en:', logoPath);
+  }
+} catch (logoError) {
+  console.warn('❌ Error al cargar el logo:', logoError.message);
+  // Continuar sin el logo si hay error
+}
+
+// ============================================
+// ENCABEZADO CON LOGO
+// ============================================
+// Ajustar altura de las primeras filas para el logo
+worksheet.getRow(1).height = 20;
+worksheet.getRow(2).height = 20;
+worksheet.getRow(3).height = 20;
+
+// Título principal (a la IZQUIERDA)
+worksheet.mergeCells('A1:B3');
+const titleCell = worksheet.getCell('A1');
+titleCell.value = 'CONTROL DE SPRINKLER\nCSEVR-001';
+titleCell.font = { bold: true, size: 16 };
+titleCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+titleCell.fill = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { argb: 'FFD3D3D3' }
+};
+titleCell.border = {
+  top: { style: 'thin' },
+  left: { style: 'thin' },
+  right: { style: 'thin' },
+  bottom: { style: 'thin' }
+};
+
+// Bordes para las celdas del logo (DERECHA)
+['C1', 'C2', 'C3', 'D1', 'D2', 'D3'].forEach(cell => {
+  worksheet.getCell(cell).border = {
+    top: { style: 'thin' },
+    left: { style: 'thin' },
+    right: { style: 'thin' },
+    bottom: { style: 'thin' }
+  };
+});
 
     // ============================================
     // INFORMACIÓN DE LA TAREA
     // ============================================
-    let currentRow = 2;
+    let currentRow = 4;
     
     const addInfoRow = (label, value) => {
       const labelCell = worksheet.getCell(`A${currentRow}`);
@@ -163,7 +223,7 @@ export const csevr_001Controller = {
         bottom: { style: 'thin' }
       };
 
-      worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
+      worksheet.mergeCells(`B${currentRow}:D${currentRow}`);
       const valueCell = worksheet.getCell(`B${currentRow}`);
       valueCell.value = value || 'N/A';
       valueCell.border = {
@@ -201,7 +261,7 @@ export const csevr_001Controller = {
       bottom: { style: 'thin' }
     };
     
-    worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
+    worksheet.mergeCells(`B${currentRow}:D${currentRow}`);
     worksheet.getCell(`B${currentRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
@@ -214,7 +274,7 @@ export const csevr_001Controller = {
     // ============================================
     // TÍTULO DE CHECKLIST
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+    worksheet.mergeCells(`A${currentRow}:D${currentRow}`);
     const checklistTitle = worksheet.getCell(`A${currentRow}`);
     checklistTitle.value = 'INDICAR SI/NO SI REALIZÓ LA TAREA INDICADA - N/A=NO APLICA-OP=OPERATIVO-NOP=NO OPERATIVO-OB=OBSERVACIÓN';
     checklistTitle.font = { bold: true, size: 10 };
@@ -234,7 +294,7 @@ export const csevr_001Controller = {
     currentRow++;
 
     // Encabezado SPRINKLER
-    worksheet.mergeCells(`A${currentRow}:B${currentRow}`);
+    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
     const sprinklerHeader = worksheet.getCell(`A${currentRow}`);
     sprinklerHeader.value = 'SPRINKLER';
     sprinklerHeader.font = { bold: true };
@@ -249,7 +309,7 @@ export const csevr_001Controller = {
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
-    worksheet.getCell(`C${currentRow}`).border = {
+    worksheet.getCell(`D${currentRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
@@ -277,7 +337,7 @@ export const csevr_001Controller = {
     ];
 
     checklistItems.forEach(item => {
-      worksheet.mergeCells(`A${currentRow}:B${currentRow}`);
+      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
       const labelCell = worksheet.getCell(`A${currentRow}`);
       labelCell.value = item.label;
       labelCell.border = {
@@ -287,7 +347,7 @@ export const csevr_001Controller = {
         bottom: { style: 'thin' }
       };
 
-      const valueCell = worksheet.getCell(`C${currentRow}`);
+      const valueCell = worksheet.getCell(`D${currentRow}`);
       valueCell.value = formulario.checklist?.[item.field] || '';
       valueCell.alignment = { horizontal: 'center', vertical: 'middle' };
       valueCell.border = {
@@ -303,7 +363,7 @@ export const csevr_001Controller = {
     // ============================================
     // NORMA BASADA
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+    worksheet.mergeCells(`A${currentRow}:D${currentRow}`);
     const normaCell = worksheet.getCell(`A${currentRow}`);
     normaCell.value = 'BASADA NORMA NFPA-25- "Norma para la Inspección, Prueba, y Mantenimiento de Sistemas de Protección contra Incendios a';
     normaCell.font = { bold: true, size: 9 };
@@ -325,9 +385,9 @@ export const csevr_001Controller = {
     // ============================================
     // COMENTARIOS
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+    worksheet.mergeCells(`A${currentRow}:D${currentRow}`);
     const comentarioHeader = worksheet.getCell(`A${currentRow}`);
-    comentarioHeader.value = 'COMETARIOS:';
+    comentarioHeader.value = 'COMENTARIOS:';
     comentarioHeader.font = { bold: true, italic: true };
     comentarioHeader.fill = {
       type: 'pattern',
@@ -342,7 +402,7 @@ export const csevr_001Controller = {
     };
     currentRow++;
 
-    worksheet.mergeCells(`A${currentRow}:C${currentRow + 3}`);
+    worksheet.mergeCells(`A${currentRow}:D${currentRow + 3}`);
     const comentarioCell = worksheet.getCell(`A${currentRow}`);
     comentarioCell.value = formulario.comentario || '';
     comentarioCell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
@@ -377,6 +437,7 @@ export const csevr_001Controller = {
     };
 
     // FIRMA SUPERVISOR AREA
+    worksheet.mergeCells(`B${firmaRow}:C${firmaRow}`);
     worksheet.getCell(`B${firmaRow}`).value = 'FIRMA SUPERVISOR AREA';
     worksheet.getCell(`B${firmaRow}`).font = { bold: true, italic: true };
     worksheet.getCell(`B${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
@@ -393,15 +454,15 @@ export const csevr_001Controller = {
     };
 
     // FIRMA BRIGADA
-    worksheet.getCell(`C${firmaRow}`).value = 'FIRMA BRIGADA';
-    worksheet.getCell(`C${firmaRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`C${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`C${firmaRow}`).fill = {
+    worksheet.getCell(`D${firmaRow}`).value = 'FIRMA BRIGADA';
+    worksheet.getCell(`D${firmaRow}`).font = { bold: true, italic: true };
+    worksheet.getCell(`D${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell(`D${firmaRow}`).fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFF0F0F0' }
     };
-    worksheet.getCell(`C${firmaRow}`).border = {
+    worksheet.getCell(`D${firmaRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
@@ -412,7 +473,7 @@ export const csevr_001Controller = {
 
     // Espacios para firmas (vacíos)
     currentRow++;
-    ['A', 'B', 'C'].forEach(col => {
+    ['A', 'B', 'C', 'D'].forEach(col => {
       worksheet.getCell(`${col}${currentRow}`).border = {
         top: { style: 'thin' },
         left: { style: 'thin' },
@@ -429,12 +490,13 @@ export const csevr_001Controller = {
       worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center' };
     }
     if (formulario.firmas?.supervisor_area) {
+      worksheet.mergeCells(`B${currentRow}:C${currentRow}`);
       worksheet.getCell(`B${currentRow}`).value = formulario.firmas.supervisor_area.nombre_usuario;
       worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center' };
     }
     if (formulario.firmas?.brigada) {
-      worksheet.getCell(`C${currentRow}`).value = formulario.firmas.brigada.nombre_usuario;
-      worksheet.getCell(`C${currentRow}`).alignment = { horizontal: 'center' };
+      worksheet.getCell(`D${currentRow}`).value = formulario.firmas.brigada.nombre_usuario;
+      worksheet.getCell(`D${currentRow}`).alignment = { horizontal: 'center' };
     }
 
     // ============================================
@@ -453,9 +515,4 @@ export const csevr_001Controller = {
     res.status(500).json({ error: 'Error al generar el archivo Excel' });
   }
 }
-
-// ============================================
-// RUTA EN EL ROUTER
-// ============================================
-// En tu archivo de rutas (csevr_001Routes.js):
 };

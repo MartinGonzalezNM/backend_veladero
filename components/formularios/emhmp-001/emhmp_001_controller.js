@@ -24,15 +24,7 @@ export const emhmp_001Controller = {
     }
   },
 
-  async obtenerPorId(req, res) {
-    try {
-      const registro = await emhmp_001Service.obtenerPorId(req.params.id);
-      if (!registro) return res.status(404).json({ error: "Registro emhmp_001 no encontrado" });
-      res.json(registro);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+ 
 
   async actualizar(req, res) {
     try {
@@ -52,5 +44,28 @@ export const emhmp_001Controller = {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  },
+  async obtenerPorId(req, res) {
+  try {
+    const registro = await emhmp_001Service.obtenerPorId(req.params.id);
+    if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
+    res.json(registro);
+    console.log('Registro encontrado:', registro);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
+},
+
+async obtenerPorIdTarea(req, res) {
+  try {
+    const registro = await emhmp_001Service.obtenerPorIdTarea(req.params.id);
+    if (!registro) return res.status(404).json({ error: "Registro no encontrado" });
+    res.json(registro);
+    console.log('Registro encontrado:', registro);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+},
+
+
 };

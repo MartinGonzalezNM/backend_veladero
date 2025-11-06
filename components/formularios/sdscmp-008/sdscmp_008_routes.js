@@ -14,6 +14,6 @@ router.delete("/:id", sdscmp_008Controller.eliminar);
 
 
 // Ruta para exportar a Excel
-router.get("/exportar/excel/:id", sdscmp_008Controller.exportarExcel);
+router.get("/tarea/:id/excel", sdscmp_008Controller.exportarExcel);
 
 export default router;

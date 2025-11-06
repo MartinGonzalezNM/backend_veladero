@@ -10,4 +10,6 @@ router.get("/:id", emhmp_001Controller.obtenerPorId);
 router.put("/:id", emhmp_001Controller.actualizar);
 router.delete("/:id", emhmp_001Controller.eliminar);
 
+router.get("/tarea/:id", emhmp_001Controller.obtenerPorIdTarea);
+
 export default router;
