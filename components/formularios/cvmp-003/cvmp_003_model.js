@@ -62,9 +62,6 @@ const cuadroValvulasInspeccionSchema = new mongoose.Schema({
     estado_campana_hidraulica: checkItemSchema,
     estado_codos_curvas: checkItemSchema
   },
-
-
-  observaciones_valvulas: { type: String }
 }, { _id: false });
 
 const cvmp_003Schema = new mongoose.Schema({
@@ -76,9 +73,7 @@ const cvmp_003Schema = new mongoose.Schema({
   codigo_formulario: { type: String, default: "CVMP-003" },
   nombre_formulario: { type: String, default: "INSPECCION CUADRO DE VALVULAS" },
   
-  sector: { type: String },
   fecha_inspeccion: { type: Date, default: Date.now },
-  nombre_firma_tecnico: { type: String },
 
   
   cuadros: [cuadroValvulasInspeccionSchema],
