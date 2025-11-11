@@ -10,5 +10,6 @@ router.put("/:id", sbmp_005Controller.actualizar);
 router.delete("/:id", sbmp_005Controller.eliminar);
 
 router.get("/tarea/:id", sbmp_005Controller.obtenerPorIdTarea);
+router.get("/tarea/:id/excel", sbmp_005Controller.exportarExcel);
 
 export default router;
