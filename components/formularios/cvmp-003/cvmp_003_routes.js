@@ -10,5 +10,6 @@ router.put("/:id", cvmp_003Controller.actualizar);
 router.delete("/:id", cvmp_003Controller.eliminar);
 
 router.get("/tarea/:id", cvmp_003Controller.obtenerPorIdTarea);
+router.get("/tarea/:id/excel", cvmp_003Controller.exportarExcel);
 
 export default router;
