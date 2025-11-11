@@ -98,13 +98,14 @@ const sbmp_005Schema = new mongoose.Schema({
   comentarios: { type: String },
 
 
-  imagenes: [{
+  // Campo para una sola imagen
+  imagen: {
     url: { type: String },
     nombre_imagen: { type: String },
     fecha_subida: { type: Date, default: Date.now },
-    tamaño: { type: Number },
-    tipo_mime: { type: String },
-  }],
+    tamaño: { type: Number }, // en bytes
+    tipo_mime: { type: String }
+  },
 
   observaciones: { type: String, enum: ["SI", "NO"] },
   observaciones_generales: { type: String },
