@@ -168,7 +168,7 @@ async exportarExcel(req, res) {
     addInfoRowLeft('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
     addInfoRowLeft('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
     
-    const fecha = new Date(formulario.fecha_inspeccion);
+    const fecha = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
     const hora = `${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
     addInfoRowLeft('HORA DE INICIO:', hora);
     addInfoRowLeft('FECHA:', fecha.toLocaleDateString('es-ES'));

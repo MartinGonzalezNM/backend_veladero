@@ -216,7 +216,7 @@ async exportarExcel(req, res) {
     addInfoRow('FECHA:', new Date(formulario.fecha_inspeccion).toLocaleDateString('es-ES'));
     
     // Calcular hora
-    const fecha = new Date(formulario.fecha_inspeccion);
+    const fecha = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
     const hora = `${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
     addInfoRow('HORA:', hora);
     

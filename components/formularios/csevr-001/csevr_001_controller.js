@@ -238,15 +238,15 @@ titleCell.border = {
       currentRow++;
     };
 
-    addInfoRow('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
-    addInfoRow('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
-    addInfoRow('DURACIÓN DE LA TAREA:', formulario.id_tarea?.id_hh);
-    addInfoRow('FECHA:', new Date(formulario.fecha_inspeccion).toLocaleDateString('es-ES'));
-    
-    // Calcular hora
-    const fecha = new Date(formulario.fecha_inspeccion);
-    const hora = `${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
-    addInfoRow('HORA:', hora);
+      addInfoRow('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
+      addInfoRow('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
+      addInfoRow('DURACIÓN DE LA TAREA:', formulario.id_tarea?.id_hh);
+      addInfoRow('FECHA:', new Date(formulario.fecha_inspeccion).toLocaleDateString('es-ES'));
+
+      // Calcular hora desde ultima_modificacion de la tarea
+      const fechaTarea = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
+      const hora = `${fechaTarea.getHours().toString().padStart(2, '0')}:${fechaTarea.getMinutes().toString().padStart(2, '0')}`;
+      addInfoRow('HORA:', hora);
     
     // Firma Inspector (vacío para rellenar manualmente)
     worksheet.getCell(`A${currentRow}`).value = 'FIRMA INSPECTOR';

@@ -74,6 +74,7 @@ export const empmp_002Controller = {
       res.status(500).json({ error: error.message });
     }
   },
+
   // ============================================
 // FUNCIÓN PARA EXPORTAR A EXCEL CON LOGO - EMPMP-002
 // ============================================
@@ -106,10 +107,23 @@ async exportarExcel(req, res) {
     let currentRow = 1;
 
     // ============================================
+    // FUNCIÓN AUXILIAR PARA MERGE SEGURO
+    // ============================================
+    const safeMergeCells = (range) => {
+      try {
+        worksheet.mergeCells(range);
+        return true;
+      } catch (error) {
+        console.warn(`⚠️ No se pudo mergear ${range}:`, error.message);
+        return false;
+      }
+    };
+
+    // ============================================
     // ENCABEZADO PRINCIPAL
     // ============================================
     const lastCol = String.fromCharCode(65 + numPinRacks);
-    worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow}`);
+    safeMergeCells(`A${currentRow}:${lastCol}${currentRow}`);
     const titleCell = worksheet.getCell(`A${currentRow}`);
     titleCell.value = 'ESTACIÓN DE MANGUERA (PIN RACKS) EMPMP-002';
     titleCell.font = { bold: true, size: 14, italic: true };
@@ -145,7 +159,7 @@ async exportarExcel(req, res) {
         bottom: { style: 'thin' }
       };
       
-      // Agregar bordes a las demás celdas de la fila (SIN COLOR DE FONDO)
+      // Agregar bordes a las demás celdas de la fila
       for (let i = 1; i <= numPinRacks; i++) {
         const col = String.fromCharCode(65 + i);
         const logoCell = worksheet.getCell(`${col}${currentRow}`);
@@ -164,9 +178,11 @@ async exportarExcel(req, res) {
     addInfoRowLeft('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
     addInfoRowLeft('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
     
-    const fecha = new Date(formulario.fecha_inspeccion);
-    const hora = `${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
+    const fechaTarea = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
+    const hora = `${fechaTarea.getHours().toString().padStart(2, '0')}:${fechaTarea.getMinutes().toString().padStart(2, '0')}`;
     addInfoRowLeft('HORA DE INICIO:', hora);
+    
+    const fecha = new Date(formulario.fecha_inspeccion);
     addInfoRowLeft('FECHA:', fecha.toLocaleDateString('es-ES'));
     addInfoRowLeft('DURACIÓN DE LA TAREA:', formulario.id_tarea?.id_hh);
 
@@ -188,13 +204,13 @@ async exportarExcel(req, res) {
 
         // Posicionar logo - MÁXIMO hasta columna G (índice 6)
         const logoStartCol = Math.max(2, Math.ceil(numPinRacks * 0.3)); // Comienza alrededor del 30%
-        const logoEndCol = Math.min(6, numPinRacks); // Máximo columna G (índice 6)
+        const logoEndCol = Math.min(7, numPinRacks + 1); // Máximo columna G
         const logoStartRow = infoStartRow - 1; 
         const logoEndRow = currentRow - 1; 
 
         worksheet.addImage(logoId, {
           tl: { col: logoStartCol, row: logoStartRow },
-          br: { col: logoEndCol + 1, row: logoEndRow },
+          br: { col: logoEndCol, row: logoEndRow },
           editAs: 'oneCell'
         });
         
@@ -246,7 +262,7 @@ async exportarExcel(req, res) {
     // ============================================
     // TÍTULO DE INSTRUCCIONES
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow}`);
+    safeMergeCells(`A${currentRow}:${lastCol}${currentRow}`);
     const instrCell = worksheet.getCell(`A${currentRow}`);
     instrCell.value = 'INDICAR SI/NO SI REALIZÓ LA TAREA INDICADA - N/A=NO APLICA- OP=OPERATIVO-NOP=NO OPERATIVO-OB=OBSERVACIÓN';
     instrCell.font = { bold: true, size: 9 };
@@ -269,7 +285,7 @@ async exportarExcel(req, res) {
     // FUNCIÓN AUXILIAR PARA AGREGAR SECCIONES
     // ============================================
     const addSectionHeader = (title) => {
-      worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow}`);
+      safeMergeCells(`A${currentRow}:${lastCol}${currentRow}`);
       const headerCell = worksheet.getCell(`A${currentRow}`);
       headerCell.value = title;
       headerCell.font = { bold: true, size: 10, italic: true };
@@ -378,7 +394,7 @@ async exportarExcel(req, res) {
     // ============================================
     // NORMA BASADA
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow}`);
+    safeMergeCells(`A${currentRow}:${lastCol}${currentRow}`);
     const normaCell = worksheet.getCell(`A${currentRow}`);
     normaCell.value = 'NOTA: PAUTA, NFPA-25 "Norma para la Inspección, Prueba, y Mantenimiento de Sistemas de Protección contra Incendios a Base de Agua"';
     normaCell.font = { bold: true, size: 8 };
@@ -395,7 +411,7 @@ async exportarExcel(req, res) {
     // ============================================
     // COMENTARIOS
     // ============================================
-    worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow}`);
+    safeMergeCells(`A${currentRow}:${lastCol}${currentRow}`);
     const comentarioHeader = worksheet.getCell(`A${currentRow}`);
     comentarioHeader.value = 'COMETARIOS:';
     comentarioHeader.font = { bold: true, italic: true, size: 10 };
@@ -409,7 +425,7 @@ async exportarExcel(req, res) {
     worksheet.getRow(currentRow).height = 18;
     currentRow++;
 
-    worksheet.mergeCells(`A${currentRow}:${lastCol}${currentRow + 2}`);
+    safeMergeCells(`A${currentRow}:${lastCol}${currentRow + 2}`);
     const comentarioCell = worksheet.getCell(`A${currentRow}`);
     comentarioCell.value = formulario.comentarios || '';
     comentarioCell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
@@ -423,7 +439,7 @@ async exportarExcel(req, res) {
     currentRow += 3;
 
     // ============================================
-    // FIRMAS (SIN LÍNEAS INTERNAS)
+    // FIRMAS
     // ============================================
     const firmaLabelRow = currentRow;
     const firmaEspacioRow = currentRow + 1;
@@ -431,63 +447,63 @@ async exportarExcel(req, res) {
     
     // Calcular tercios de columnas
     const tercio = Math.floor(totalColumns / 3);
-    const col1Start = 0;
-    const col1End = tercio - 1;
+    const col1End = Math.max(0, tercio - 1);
     const col2Start = tercio;
-    const col2End = (tercio * 2) - 1;
+    const col2End = Math.max(tercio, (tercio * 2) - 1);
     const col3Start = tercio * 2;
-    const col3End = numPinRacks;
 
-    // ETIQUETAS DE FIRMAS
-    // FIRMA SUPERVISOR
+    // Convertir índices a letras de columnas
     const supervisorEndCol = String.fromCharCode(65 + col1End);
-    worksheet.mergeCells(`A${firmaLabelRow}:${supervisorEndCol}${firmaLabelRow}`);
-    worksheet.getCell(`A${firmaLabelRow}`).value = 'FIRMA SUPERVISOR';
-    worksheet.getCell(`A${firmaLabelRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`A${firmaLabelRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`A${firmaLabelRow}`).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFF0F0F0' }
-    };
-    worksheet.getCell(`A${firmaLabelRow}`).border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' },
-      bottom: { style: 'thin' }
-    };
-
-    // FIRMA SUPERVISOR AREA
     const areaStartCol = String.fromCharCode(65 + col2Start);
     const areaEndCol = String.fromCharCode(65 + col2End);
-    worksheet.mergeCells(`${areaStartCol}${firmaLabelRow}:${areaEndCol}${firmaLabelRow}`);
-    worksheet.getCell(`${areaStartCol}${firmaLabelRow}`).value = 'SUPERVISOR AREA';
-    worksheet.getCell(`${areaStartCol}${firmaLabelRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`${areaStartCol}${firmaLabelRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`${areaStartCol}${firmaLabelRow}`).fill = {
+    const brigadaStartCol = String.fromCharCode(65 + col3Start);
+
+    // ETIQUETAS DE FIRMAS
+    safeMergeCells(`A${firmaLabelRow}:${supervisorEndCol}${firmaLabelRow}`);
+    const supLabelCell = worksheet.getCell(`A${firmaLabelRow}`);
+    supLabelCell.value = 'FIRMA SUPERVISOR';
+    supLabelCell.font = { bold: true, italic: true };
+    supLabelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    supLabelCell.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFF0F0F0' }
     };
-    worksheet.getCell(`${areaStartCol}${firmaLabelRow}`).border = {
+    supLabelCell.border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    // FIRMA BRIGADA
-    const brigadaStartCol = String.fromCharCode(65 + col3Start);
-    worksheet.mergeCells(`${brigadaStartCol}${firmaLabelRow}:${lastCol}${firmaLabelRow}`);
-    worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`).value = 'FIRMA BRIGADA';
-    worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`).fill = {
+    safeMergeCells(`${areaStartCol}${firmaLabelRow}:${areaEndCol}${firmaLabelRow}`);
+    const areaLabelCell = worksheet.getCell(`${areaStartCol}${firmaLabelRow}`);
+    areaLabelCell.value = 'SUPERVISOR AREA';
+    areaLabelCell.font = { bold: true, italic: true };
+    areaLabelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    areaLabelCell.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFF0F0F0' }
     };
-    worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`).border = {
+    areaLabelCell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    safeMergeCells(`${brigadaStartCol}${firmaLabelRow}:${lastCol}${firmaLabelRow}`);
+    const brigLabelCell = worksheet.getCell(`${brigadaStartCol}${firmaLabelRow}`);
+    brigLabelCell.value = 'FIRMA BRIGADA';
+    brigLabelCell.font = { bold: true, italic: true };
+    brigLabelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    brigLabelCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    brigLabelCell.border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
@@ -496,28 +512,28 @@ async exportarExcel(req, res) {
 
     worksheet.getRow(firmaLabelRow).height = 25;
 
-    // ESPACIOS PARA FIRMAR - MERGE POR SECCIÓN (SIN LÍNEAS INTERNAS)
-    // Sección 1: Supervisor
-    worksheet.mergeCells(`A${firmaEspacioRow}:${supervisorEndCol}${firmaEspacioRow}`);
-    worksheet.getCell(`A${firmaEspacioRow}`).border = {
+    // ESPACIOS PARA FIRMAR
+    safeMergeCells(`A${firmaEspacioRow}:${supervisorEndCol}${firmaEspacioRow}`);
+    const supEspacioCell = worksheet.getCell(`A${firmaEspacioRow}`);
+    supEspacioCell.border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    // Sección 2: Supervisor Área
-    worksheet.mergeCells(`${areaStartCol}${firmaEspacioRow}:${areaEndCol}${firmaEspacioRow}`);
-    worksheet.getCell(`${areaStartCol}${firmaEspacioRow}`).border = {
+    safeMergeCells(`${areaStartCol}${firmaEspacioRow}:${areaEndCol}${firmaEspacioRow}`);
+    const areaEspacioCell = worksheet.getCell(`${areaStartCol}${firmaEspacioRow}`);
+    areaEspacioCell.border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    // Sección 3: Brigada
-    worksheet.mergeCells(`${brigadaStartCol}${firmaEspacioRow}:${lastCol}${firmaEspacioRow}`);
-    worksheet.getCell(`${brigadaStartCol}${firmaEspacioRow}`).border = {
+    safeMergeCells(`${brigadaStartCol}${firmaEspacioRow}:${lastCol}${firmaEspacioRow}`);
+    const brigEspacioCell = worksheet.getCell(`${brigadaStartCol}${firmaEspacioRow}`);
+    brigEspacioCell.border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
@@ -528,24 +544,45 @@ async exportarExcel(req, res) {
 
     // NOMBRES DE QUIENES FIRMARON
     if (formulario.firmas?.supervisor) {
-      worksheet.mergeCells(`A${firmaNombreRow}:${supervisorEndCol}${firmaNombreRow}`);
-      worksheet.getCell(`A${firmaNombreRow}`).value = formulario.firmas.supervisor.nombre_usuario;
-      worksheet.getCell(`A${firmaNombreRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-      worksheet.getCell(`A${firmaNombreRow}`).font = { size: 9 };
+      safeMergeCells(`A${firmaNombreRow}:${supervisorEndCol}${firmaNombreRow}`);
+      const supNombreCell = worksheet.getCell(`A${firmaNombreRow}`);
+      supNombreCell.value = formulario.firmas.supervisor.nombre_usuario;
+      supNombreCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      supNombreCell.font = { size: 9 };
+      supNombreCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
     }
 
     if (formulario.firmas?.supervisor_area) {
-      worksheet.mergeCells(`${areaStartCol}${firmaNombreRow}:${areaEndCol}${firmaNombreRow}`);
-      worksheet.getCell(`${areaStartCol}${firmaNombreRow}`).value = formulario.firmas.supervisor_area.nombre_usuario;
-      worksheet.getCell(`${areaStartCol}${firmaNombreRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-      worksheet.getCell(`${areaStartCol}${firmaNombreRow}`).font = { size: 9 };
+      safeMergeCells(`${areaStartCol}${firmaNombreRow}:${areaEndCol}${firmaNombreRow}`);
+      const areaNombreCell = worksheet.getCell(`${areaStartCol}${firmaNombreRow}`);
+      areaNombreCell.value = formulario.firmas.supervisor_area.nombre_usuario;
+      areaNombreCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      areaNombreCell.font = { size: 9 };
+      areaNombreCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
     }
 
     if (formulario.firmas?.brigada) {
-      worksheet.mergeCells(`${brigadaStartCol}${firmaNombreRow}:${lastCol}${firmaNombreRow}`);
-      worksheet.getCell(`${brigadaStartCol}${firmaNombreRow}`).value = formulario.firmas.brigada.nombre_usuario;
-      worksheet.getCell(`${brigadaStartCol}${firmaNombreRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-      worksheet.getCell(`${brigadaStartCol}${firmaNombreRow}`).font = { size: 9 };
+      safeMergeCells(`${brigadaStartCol}${firmaNombreRow}:${lastCol}${firmaNombreRow}`);
+      const brigNombreCell = worksheet.getCell(`${brigadaStartCol}${firmaNombreRow}`);
+      brigNombreCell.value = formulario.firmas.brigada.nombre_usuario;
+      brigNombreCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      brigNombreCell.font = { size: 9 };
+      brigNombreCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
     }
 
     worksheet.getRow(firmaNombreRow).height = 20;

@@ -166,11 +166,13 @@ async exportarExcel(req, res) {
     addInfoRowLeft('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
     addInfoRowLeft('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
     
-    const fecha = new Date(formulario.fecha_inspeccion);
+    const fecha = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
     const hora = `${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
-    addInfoRowLeft('HORARIO DE INICIO', hora);
+    addInfoRowLeft('HORA', hora);
     addInfoRowLeft('FECHA:', fecha.toLocaleDateString('es-ES'));
     addInfoRowLeft('DURACION DE LA TAREA', formulario.id_tarea?.id_hh);
+
+
 
     // ============================================
     // AGREGAR LOGO (LIMITADO HASTA COLUMNA G)
