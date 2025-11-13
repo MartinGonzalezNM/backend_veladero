@@ -8,6 +8,8 @@ const sdscmp_008Schema = new mongoose.Schema({
   fecha_inspeccion: { type: Date, default: Date.now },
 
   checklist: {
+    numero_precinto_existente:{type: String, enum: ["SI", "NO", "N/A", "OP", "NOP", "OB"]},
+    numero_precinto_nuevo:{type: String, enum: ["SI", "NO", "N/A", "OP", "NOP", "OB"]},
     panel_alarma_operativo: { type: String, enum: ["SI", "NO", "N/A", "OP", "NOP", "OB"] },
     pilotos_led_operativos: { type: String, enum: ["SI", "NO", "N/A", "OP", "NOP", "OB"] },
     detectores_temperatura_operativos: { type: String, enum: ["SI", "NO", "N/A", "OP", "NOP", "OB"] },
