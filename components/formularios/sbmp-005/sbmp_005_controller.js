@@ -76,12 +76,11 @@ async obtenerPorIdTarea(req, res) {
     res.status(500).json({ error: error.message });
   }
 },
-
 // ============================================
-// FUNCIÓN PARA EXPORTAR SBMP-005 A EXCEL CON LOGO
+// FUNCIÓN PARA EXPORTAR SBMP-005 A EXCEL CON 2 HOJAS
 // ============================================
 
-async exportarExcel(req, res) {
+async exportarExcelCompleto(req, res) {
   try {
     const { id } = req.params;
     
@@ -94,22 +93,24 @@ async exportarExcel(req, res) {
 
     // Crear nuevo workbook
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('SBMP-005');
+
+    // ============================================
+    // HOJA 1: CHECKLIST PRINCIPAL
+    // ============================================
+    const worksheet1 = workbook.addWorksheet('SBMP-005 Hoja 1');
 
     // Configurar ancho de columnas
-    worksheet.columns = [
+    worksheet1.columns = [
       { width: 60 },  // Columna A (descripción)
       { width: 15 },  // Columna B (respuesta)
       { width: 25 },  // Columna C (nivel/extra)
     ];
 
     // ============================================
-    // AGREGAR LOGO
+    // AGREGAR LOGO HOJA 1
     // ============================================
     try {
       const logoPath = path.join(__dirname, '..', '..', 'logo', 'LogoChiconi.webp');
-      
-      console.log('Buscando logo en:', logoPath);
       
       if (fs.existsSync(logoPath)) {
         const logoBuffer = fs.readFileSync(logoPath);
@@ -119,29 +120,27 @@ async exportarExcel(req, res) {
           extension: 'png',
         });
 
-        // Insertar logo en la parte derecha (columnas B-C, filas 1-6)
-        worksheet.addImage(logoId, {
+        worksheet1.addImage(logoId, {
           tl: { col: 1, row: 0 },
           br: { col: 3, row: 6 },
           editAs: 'oneCell'
         });
         
-        console.log('✅ Logo agregado exitosamente');
-      } else {
-        console.warn('⚠️ Logo no encontrado en:', logoPath);
+        console.log('✅ Logo agregado exitosamente en Hoja 1');
       }
     } catch (logoError) {
       console.warn('❌ Error al cargar el logo:', logoError.message);
     }
 
     // ============================================
-    // ENCABEZADO CON LOGO
+    // ENCABEZADO HOJA 1
     // ============================================
-    worksheet.getRow(1).height = 30;
+    let currentRow = 1;
+    worksheet1.getRow(1).height = 30;
 
     // Título principal
-    worksheet.mergeCells('A1:A1');
-    const titleCell = worksheet.getCell('A1');
+    worksheet1.mergeCells('A1:A1');
+    const titleCell = worksheet1.getCell('A1');
     titleCell.value = 'SALAS DE BOMBAS - SBMP-005';
     titleCell.font = { bold: true, size: 16, italic: true };
     titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -160,7 +159,7 @@ async exportarExcel(req, res) {
     // Bordes para celdas del logo
     for (let row = 1; row <= 6; row++) {
       ['B', 'C'].forEach(col => {
-        worksheet.getCell(`${col}${row}`).border = {
+        worksheet1.getCell(`${col}${row}`).border = {
           top: { style: 'thin' },
           left: { style: 'thin' },
           right: { style: 'thin' },
@@ -169,14 +168,11 @@ async exportarExcel(req, res) {
       });
     }
 
-    // ============================================
-    // INFORMACIÓN DE LA TAREA
-    // ============================================
-    let currentRow = 2;
+    currentRow = 2;
     
-    const addInfoRow = (label, value, mergeColumns = true) => {
-      const labelCell = worksheet.getCell(`A${currentRow}`);
-      labelCell.value = label;
+    const addInfoRow = (label, value) => {
+      const labelCell = worksheet1.getCell(`A${currentRow}`);
+      labelCell.value = `${label} ${value || ''}`;
       labelCell.font = { bold: true, italic: true };
       labelCell.fill = {
         type: 'pattern',
@@ -189,25 +185,26 @@ async exportarExcel(req, res) {
         right: { style: 'thin' },
         bottom: { style: 'thin' }
       };
-
       currentRow++;
     };
 
-    addInfoRow('SECTOR:');
-    addInfoRow('INSPECTOR:');
-    addInfoRow('DURACIÓN DE LA TAREA:');
-    addInfoRow('FECHA:');
-    addInfoRow('HORA:');
-    addInfoRow('FIRMA INSPECTOR');
+    addInfoRow('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
+    addInfoRow('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
+    addInfoRow('DURACIÓN DE LA TAREA:', formulario.id_tarea?.id_hh);
+    addInfoRow('FECHA:', new Date(formulario.fecha_inspeccion).toLocaleDateString('es-ES'));
     
-    worksheet.getRow(7).height = 30;
+    // Calcular hora desde ultima_modificacion de la tarea
+    const fechaTarea = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
+    const hora = `${fechaTarea.getHours().toString().padStart(2, '0')}:${fechaTarea.getMinutes().toString().padStart(2, '0')}`;
+    addInfoRow('HORA:', hora);
+    addInfoRow('FIRMA INSPECTOR', '');
+    
+    worksheet1.getRow(7).height = 30;
     currentRow = 8;
 
-    // ============================================
-    // TÍTULO DE INSTRUCCIONES
-    // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
-    const instruccionesCell = worksheet.getCell(`A${currentRow}`);
+    // Instrucciones
+    worksheet1.mergeCells(`A${currentRow}:C${currentRow}`);
+    const instruccionesCell = worksheet1.getCell(`A${currentRow}`);
     instruccionesCell.value = 'INDICAR SI/NO SI REALIZO LA TAREA INDICADA - N/A=NO APLICA-OP=OPERATIVO-NOP=NO OPERATIVO-OB=OBSERVACIÓN';
     instruccionesCell.font = { bold: true, size: 9 };
     instruccionesCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
@@ -222,18 +219,14 @@ async exportarExcel(req, res) {
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
-    worksheet.getRow(currentRow).height = 25;
+    worksheet1.getRow(currentRow).height = 25;
     currentRow++;
 
-    // Obtener el checklist (primer elemento del array)
     const checklist = formulario.checklist?.[0] || {};
 
-    // ============================================
-    // FUNCIÓN AUXILIAR PARA AGREGAR SECCIONES
-    // ============================================
     const addSeccionHeader = (titulo) => {
-      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
-      const headerCell = worksheet.getCell(`A${currentRow}`);
+      worksheet1.mergeCells(`A${currentRow}:C${currentRow}`);
+      const headerCell = worksheet1.getCell(`A${currentRow}`);
       headerCell.value = titulo;
       headerCell.font = { bold: true, size: 11 };
       headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -252,8 +245,7 @@ async exportarExcel(req, res) {
     };
 
     const addCheckItem = (label, valor, nivel = null) => {
-      // Columna A: Descripción
-      const labelCell = worksheet.getCell(`A${currentRow}`);
+      const labelCell = worksheet1.getCell(`A${currentRow}`);
       labelCell.value = label;
       labelCell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
       labelCell.border = {
@@ -263,8 +255,7 @@ async exportarExcel(req, res) {
         bottom: { style: 'thin' }
       };
 
-      // Columna B: Respuesta
-      const valorCell = worksheet.getCell(`B${currentRow}`);
+      const valorCell = worksheet1.getCell(`B${currentRow}`);
       valorCell.value = valor || '';
       valorCell.alignment = { horizontal: 'center', vertical: 'middle' };
       valorCell.border = {
@@ -274,8 +265,7 @@ async exportarExcel(req, res) {
         bottom: { style: 'thin' }
       };
 
-      // Columna C: Nivel (si aplica)
-      const nivelCell = worksheet.getCell(`C${currentRow}`);
+      const nivelCell = worksheet1.getCell(`C${currentRow}`);
       if (nivel !== null) {
         nivelCell.value = `NIVEL: ${nivel || ''}`;
         nivelCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -290,9 +280,7 @@ async exportarExcel(req, res) {
       currentRow++;
     };
 
-    // ============================================
     // CUBA CONTENEDORA DE AGUA
-    // ============================================
     addSeccionHeader('CUBA CONTENEDORA DE AGUA');
     addCheckItem(
       'CONTROLAR HE INDICAR NIVEL DE AGUA',
@@ -308,9 +296,7 @@ async exportarExcel(req, res) {
       checklist.cuba_contenedora_agua?.verificar_eliminar_puntos_filtraciones?.estado
     );
 
-    // ============================================
     // VÁLVULA DE ASPIRACIÓN
-    // ============================================
     addSeccionHeader('VALVULA DE ASPIRACION');
     addCheckItem(
       'REALIZO RECORRIDO MECANICO DE LA VALVULA APERTURA/CIERRE',
@@ -341,9 +327,7 @@ async exportarExcel(req, res) {
       checklist.valvula_aspiracion?.valvula_descarga_abierta?.estado
     );
 
-    // ============================================
     // VÁLVULAS DE DESCARGA
-    // ============================================
     addSeccionHeader('VALVULAS DE DESCARGA');
     addCheckItem(
       'REALIZO RECORRIDO MECANICO DE LA VALVULA APERTURA/CIERRE',
@@ -374,9 +358,7 @@ async exportarExcel(req, res) {
       checklist.valvulas_recirculacion?.valvulas_recirculacion_queda_cerrada?.estado
     );
 
-    // ============================================
-    // VÁLVULAS DE RECIRCULACIÓN
-    // ============================================
+    // Continuar con las demás secciones...
     addSeccionHeader('VALVULAS DE RECIRCULACION');
     addCheckItem(
       'REALIZO RECORRIDO MECANICO DE LA VALVULA DE RECIRCULACION',
@@ -407,9 +389,6 @@ async exportarExcel(req, res) {
       checklist.valvulas_recirculacion?.valvulas_recirculacion_queda_cerrada?.estado
     );
 
-    // ============================================
-    // VÁLVULAS DE DESCARGA Y ALIVIO
-    // ============================================
     addSeccionHeader('VALVULAS DE DESCARGA Y ALIVIO');
     addCheckItem(
       'OBSERVO PUNTOS DE OXIDACION Y CORRIGIO?',
@@ -424,9 +403,6 @@ async exportarExcel(req, res) {
       checklist.valvula_descarga_alivio?.verificar_valvula_descarga_correctamente?.estado
     );
 
-    // ============================================
-    // BOMBA JOCKEY
-    // ============================================
     addSeccionHeader('BOMBA JOCKEY');
     addCheckItem(
       'OBSERVO PUNTOS DE OXIDACION Y CORRIGIO',
@@ -441,9 +417,6 @@ async exportarExcel(req, res) {
       checklist.bomba_jockey?.comprobar_apertura_cierre_valvula_descarga?.estado
     );
 
-    // ============================================
-    // ELECTROBOMBA
-    // ============================================
     addSeccionHeader('ELECTROBOMBA');
     addCheckItem(
       'OBSERVO PUNTOS DE OXIDACION Y CORRIGIO',
@@ -462,9 +435,6 @@ async exportarExcel(req, res) {
       checklist.electrobomba?.comprobar_apertura_cierre_valvula_descarga?.estado
     );
 
-    // ============================================
-    // MOTO BOMBA
-    // ============================================
     addSeccionHeader('MOTO BOMBA');
     addCheckItem(
       'VERIFICAR ESTADO FISICO DE LA BOMBA',
@@ -483,9 +453,6 @@ async exportarExcel(req, res) {
       checklist.moto_bomba?.abrir_cerrar_valvula_descarga?.estado
     );
 
-    // ============================================
-    // TRACING
-    // ============================================
     addSeccionHeader('TRACING');
     addCheckItem(
       'LOS TRACING ESTAN ENERGIZADOS',
@@ -508,9 +475,6 @@ async exportarExcel(req, res) {
       checklist.tracing?.tracing_se_encuentra_recubierto?.estado
     );
 
-    // ============================================
-    // ORDEN Y LIMPIEZA
-    // ============================================
     addSeccionHeader('ORDEN Y LIMPIEZA');
     addCheckItem(
       'REALIZO ORDEN Y LIMPIEZA DE SALA',
@@ -521,11 +485,9 @@ async exportarExcel(req, res) {
       checklist.orden_limpieza?.realizo_eliminacion_obstaculos?.estado
     );
 
-    // ============================================
     // NORMA BASADA
-    // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
-    const normaCell = worksheet.getCell(`A${currentRow}`);
+    worksheet1.mergeCells(`A${currentRow}:C${currentRow}`);
+    const normaCell = worksheet1.getCell(`A${currentRow}`);
     normaCell.value = 'NOTA : PAUTA BASADA NORMA NFPA-25: "Norma para la Inspección, Prueba, y Mantenimiento de Sistemas de Protección contra Incendios a Base de Agua"';
     normaCell.font = { bold: true, size: 9 };
     normaCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
@@ -540,14 +502,12 @@ async exportarExcel(req, res) {
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
-    worksheet.getRow(currentRow).height = 25;
+    worksheet1.getRow(currentRow).height = 25;
     currentRow++;
 
-    // ============================================
     // COMENTARIOS
-    // ============================================
-    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
-    const comentarioHeader = worksheet.getCell(`A${currentRow}`);
+    worksheet1.mergeCells(`A${currentRow}:C${currentRow}`);
+    const comentarioHeader = worksheet1.getCell(`A${currentRow}`);
     comentarioHeader.value = 'COMETARIOS:';
     comentarioHeader.font = { bold: true, italic: true };
     comentarioHeader.alignment = { horizontal: 'left', vertical: 'middle' };
@@ -564,8 +524,8 @@ async exportarExcel(req, res) {
     };
     currentRow++;
 
-    worksheet.mergeCells(`A${currentRow}:C${currentRow + 4}`);
-    const comentarioCell = worksheet.getCell(`A${currentRow}`);
+    worksheet1.mergeCells(`A${currentRow}:C${currentRow + 4}`);
+    const comentarioCell = worksheet1.getCell(`A${currentRow}`);
     comentarioCell.value = formulario.comentarios || '';
     comentarioCell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
     comentarioCell.border = {
@@ -574,93 +534,539 @@ async exportarExcel(req, res) {
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
-    worksheet.getRow(currentRow).height = 100;
+    worksheet1.getRow(currentRow).height = 100;
     currentRow += 5;
 
-    // ============================================
     // FIRMAS
-    // ============================================
     const firmaRow = currentRow;
     
-    // FIRMA SUPERVISOR
-    worksheet.getCell(`A${firmaRow}`).value = 'FIRMA SUPERVISOR';
-    worksheet.getCell(`A${firmaRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`A${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`A${firmaRow}`).fill = {
+    worksheet1.getCell(`A${firmaRow}`).value = 'FIRMA SUPERVISOR';
+    worksheet1.getCell(`A${firmaRow}`).font = { bold: true, italic: true };
+    worksheet1.getCell(`A${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet1.getCell(`A${firmaRow}`).fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFFFFFFF' }
     };
-    worksheet.getCell(`A${firmaRow}`).border = {
+    worksheet1.getCell(`A${firmaRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    // FIRMA SUPERVISOR AREA
-    worksheet.getCell(`B${firmaRow}`).value = 'FIRMA SUPERVISOR AREA';
-    worksheet.getCell(`B${firmaRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`B${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`B${firmaRow}`).fill = {
+    worksheet1.getCell(`B${firmaRow}`).value = 'FIRMA SUPERVISOR AREA';
+    worksheet1.getCell(`B${firmaRow}`).font = { bold: true, italic: true };
+    worksheet1.getCell(`B${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet1.getCell(`B${firmaRow}`).fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFFFFFFF' }
     };
-    worksheet.getCell(`B${firmaRow}`).border = {
+    worksheet1.getCell(`B${firmaRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    // FIRMA BRIGADA
-    worksheet.getCell(`C${firmaRow}`).value = 'FIRMA BRIGADA';
-    worksheet.getCell(`C${firmaRow}`).font = { bold: true, italic: true };
-    worksheet.getCell(`C${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-    worksheet.getCell(`C${firmaRow}`).fill = {
+    worksheet1.getCell(`C${firmaRow}`).value = 'FIRMA BRIGADA';
+    worksheet1.getCell(`C${firmaRow}`).font = { bold: true, italic: true };
+    worksheet1.getCell(`C${firmaRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet1.getCell(`C${firmaRow}`).fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFFFFFFF' }
     };
-    worksheet.getCell(`C${firmaRow}`).border = {
+    worksheet1.getCell(`C${firmaRow}`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       right: { style: 'thin' },
       bottom: { style: 'thin' }
     };
 
-    worksheet.getRow(firmaRow).height = 25;
+    worksheet1.getRow(firmaRow).height = 25;
 
-    // Espacios para firmas (vacíos)
     currentRow++;
     ['A', 'B', 'C'].forEach(col => {
-      worksheet.getCell(`${col}${currentRow}`).border = {
+      worksheet1.getCell(`${col}${currentRow}`).border = {
         top: { style: 'thin' },
         left: { style: 'thin' },
         right: { style: 'thin' },
         bottom: { style: 'thin' }
       };
     });
-    worksheet.getRow(currentRow).height = 40;
+    worksheet1.getRow(currentRow).height = 40;
 
-    // Nombres de quien firmó (si están disponibles)
     currentRow++;
     if (formulario.firmas?.supervisor) {
-      worksheet.getCell(`A${currentRow}`).value = formulario.firmas.supervisor.nombre_usuario;
-      worksheet.getCell(`A${currentRow}`).alignment = { horizontal: 'center' };
+      worksheet1.getCell(`A${currentRow}`).value = formulario.firmas.supervisor.nombre_usuario;
+      worksheet1.getCell(`A${currentRow}`).alignment = { horizontal: 'center' };
     }
     if (formulario.firmas?.supervisor_area) {
-      worksheet.getCell(`B${currentRow}`).value = formulario.firmas.supervisor_area.nombre_usuario;
-      worksheet.getCell(`B${currentRow}`).alignment = { horizontal: 'center' };
+      worksheet1.getCell(`B${currentRow}`).value = formulario.firmas.supervisor_area.nombre_usuario;
+      worksheet1.getCell(`B${currentRow}`).alignment = { horizontal: 'center' };
     }
     if (formulario.firmas?.brigada) {
-      worksheet.getCell(`C${currentRow}`).value = formulario.firmas.brigada.nombre_usuario;
-      worksheet.getCell(`C${currentRow}`).alignment = { horizontal: 'center' };
+      worksheet1.getCell(`C${currentRow}`).value = formulario.firmas.brigada.nombre_usuario;
+      worksheet1.getCell(`C${currentRow}`).alignment = { horizontal: 'center' };
     }
 
     // ============================================
-    // GENERAR Y ENVIAR ARCHIVO
+    // HOJA 2: ITEMS A CONTROLAR
+    // ============================================
+    const worksheet2 = workbook.addWorksheet('SBMP-005 Hoja 2');
+
+    worksheet2.columns = [
+      { width: 60 },  // Columna A
+      { width: 15 },  // Columna B
+      { width: 25 },  // Columna C
+    ];
+
+    let row2 = 1;
+
+    // Logo Hoja 2
+    try {
+      const logoPath = path.join(__dirname, '..', '..', 'logo', 'LogoChiconi.webp');
+      
+      if (fs.existsSync(logoPath)) {
+        const logoBuffer = fs.readFileSync(logoPath);
+        
+        const logoId2 = workbook.addImage({
+          buffer: logoBuffer,
+          extension: 'png',
+        });
+
+        worksheet2.addImage(logoId2, {
+          tl: { col: 1, row: 0 },
+          br: { col: 3, row: 6 },
+          editAs: 'oneCell'
+        });
+      }
+    } catch (logoError) {
+      console.warn('❌ Error al cargar el logo en Hoja 2:', logoError.message);
+    }
+
+    // Encabezado Hoja 2
+    worksheet2.getRow(1).height = 30;
+    worksheet2.mergeCells('A1:A1');
+    const titleCell2 = worksheet2.getCell('A1');
+    titleCell2.value = 'ITEMS A CONTROLAR - SBMP-005';
+    titleCell2.font = { bold: true, size: 16, italic: true };
+    titleCell2.alignment = { horizontal: 'center', vertical: 'middle' };
+    titleCell2.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    titleCell2.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    for (let r = 1; r <= 6; r++) {
+      ['B', 'C'].forEach(col => {
+        worksheet2.getCell(`${col}${r}`).border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' },
+          bottom: { style: 'thin' }
+        };
+      });
+    }
+
+    row2 = 2;
+
+    const addInfoRow2 = (label, value) => {
+      const labelCell = worksheet2.getCell(`A${row2}`);
+      labelCell.value = `${label} ${value || ''}`;
+      labelCell.font = { bold: true, italic: true };
+      labelCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFFFF' }
+      };
+      labelCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+      
+      // Agregar bordes a las demás celdas de la fila (para el logo)
+      ['B', 'C'].forEach(col => {
+        const cell = worksheet2.getCell(`${col}${row2}`);
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' },
+          bottom: { style: 'thin' }
+        };
+      });
+      
+      row2++;
+    };
+
+    addInfoRow2('SECTOR:', formulario.id_tarea?.id_sector?.nombre_sector);
+    addInfoRow2('INSPECTOR:', formulario.id_tarea?.responsable?.nombre_usuario);
+    addInfoRow2('DURACIÓN DE LA TAREA:', formulario.id_tarea?.id_hh);
+    addInfoRow2('FECHA:', new Date(formulario.fecha_inspeccion).toLocaleDateString('es-ES'));
+    
+    // Calcular hora desde ultima_modificacion de la tarea
+    const fechaTarea2 = new Date(formulario.id_tarea?.ultima_modificacion || formulario.fecha_inspeccion);
+    const hora2 = `${fechaTarea2.getHours().toString().padStart(2, '0')}:${fechaTarea2.getMinutes().toString().padStart(2, '0')}`;
+    addInfoRow2('HORA:', hora2);
+    addInfoRow2('FIRMA INSPECTOR', '');
+    
+    worksheet2.getRow(7).height = 30;
+    row2 = 8;
+
+    // Instrucciones
+    worksheet2.mergeCells(`A${row2}:C${row2}`);
+    const instrCell2 = worksheet2.getCell(`A${row2}`);
+    instrCell2.value = 'INDICAR SI/NO SI REALIZO LA TAREA INDICADA - N/A=NO APLICA-OP=OPERATIVO-NOP=NO OPERATIVO-OB=OBSERVACIÓN';
+    instrCell2.font = { bold: true, size: 9 };
+    instrCell2.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    instrCell2.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    instrCell2.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet2.getRow(row2).height = 25;
+    row2++;
+
+    const items = checklist.items_a_controlar || {};
+
+    const addSeccionHeader2 = (titulo) => {
+      worksheet2.mergeCells(`A${row2}:C${row2}`);
+      const headerCell = worksheet2.getCell(`A${row2}`);
+      headerCell.value = titulo;
+      headerCell.font = { bold: true, size: 11 };
+      headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      headerCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFD3D3D3' }
+      };
+      headerCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+      row2++;
+    };
+
+    const addCheckItem2 = (label, valor, extra = null) => {
+      const labelCell = worksheet2.getCell(`A${row2}`);
+      labelCell.value = label;
+      labelCell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+      labelCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+
+      const valorCell = worksheet2.getCell(`B${row2}`);
+      valorCell.value = valor || '';
+      valorCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      valorCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+
+      const extraCell = worksheet2.getCell(`C${row2}`);
+      if (extra !== null) {
+        extraCell.value = extra || '';
+        extraCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+      extraCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+
+      row2++;
+    };
+
+    // ============================================
+    // CONTENIDO HOJA 2: ITEMS A CONTROLAR
+    // ============================================
+    addSeccionHeader2('ITEMS A CONTROLAR');
+
+    addCheckItem2(
+      'CONTROLÓ TEMPERATURA AMBIENTE',
+      items.controlo_temperatura_ambiente?.estado
+    );
+    addCheckItem2(
+      'TRAMPAS DE VENTILACIÓN DESPEJADAS',
+      items.trampas_ventilacion_despejadas?.estado
+    );
+    addCheckItem2(
+      'FILTRACIONES DE AGUA EN TUBERÍAS ELIMINADAS',
+      items.filtraciones_agua_tuberias_eliminadas?.estado
+    );
+    addCheckItem2(
+      'SEÑALES LUMINOSAS DEL TABLERO DE MANDO',
+      items.señales_luminosas_tablero_mando?.estado
+    );
+    addCheckItem2(
+      'PILOTOS DE PRESENCIA ELÉCTRICA FUNCIONANDO',
+      items.pilotos_presencia_electrica_funcionando?.estado
+    );
+    addCheckItem2(
+      'NIVEL DE ACEITE DEL CÁRTER',
+      items.nivel_aceite_carter?.estado
+    );
+    addCheckItem2(
+      'NIVEL TK LLENO',
+      items.nivel_tk_lleno?.estado
+    );
+    addCheckItem2(
+      'VERIFICÓ Y ELIMINÓ RESTOS DE ÓXIDOS DEL ESTADO TK',
+      items.verifico_elimino_restos_oxidos_estado_tk?.estado
+    );
+    addCheckItem2(
+      'LECTURA DE VOLTAJE DE BATERÍAS',
+      items.lectura_voltaje_baterias?.estado,
+      items.bat_1 && items.bat_2 ? `BAT 1: ${items.bat_1} | BAT 2: ${items.bat_2}` : null
+    );
+    addCheckItem2(
+      'NIVEL DE AGUA DE REFRIGERACIÓN',
+      items.nivel_agua_refrigeracion?.estado
+    );
+    addCheckItem2(
+      'ELIMINÓ SULFATACIÓN DE BORNES DE BATERÍAS',
+      items.elimino_sulfatacion_bornes_baterias?.estado
+    );
+    addCheckItem2(
+      'CONTROLÓ ENERGIZACIÓN CABLE CALEFACTOR NORMAL Y EFECTIVA',
+      items.controlo_energizacion_cable_calefactor_normal_efectiva?.estado
+    );
+    addCheckItem2(
+      'COMPROBAR Y CORREGIR FUGAS DE ESCAPE',
+      items.comprobar_corregir_fugas_escape?.estado
+    );
+    addCheckItem2(
+      'COMPROBAR Y CORREGIR CARGA DE BATERÍAS',
+      items.comprobar_corregir_carga_baterias?.estado
+    );
+    addCheckItem2(
+      'ABRIÓ Y CERRÓ VÁLVULAS DE DRENAJE (QUEDÓ CERRADA)',
+      items.abrio_cerro_valvulas_drenaje_quedo_cerrada?.estado
+    );
+    addCheckItem2(
+      'ESTADO DEL TABLERO ELÉCTRICO DE CONTROL NORMAL',
+      items.estado_tablero_electrico_control_normal?.estado
+    );
+    addCheckItem2(
+      'ABRIÓ Y CERRÓ VÁLVULA DE ASPIRACIÓN (QUEDÓ ABIERTA)',
+      items.abrio_cerro_valvula_aspiracion_quedo_abierta?.estado
+    );
+    addCheckItem2(
+      'ABRIÓ Y CERRÓ VÁLVULA DE DESCARGA (QUEDÓ ABIERTA)',
+      items.abrio_cerro_valvula_descarga_quedo_abierta?.estado
+    );
+    addCheckItem2(
+      'ABRIÓ Y CERRÓ VÁLVULA DE RECIRCULACIÓN (QUEDÓ CERRADA)',
+      items.abrio_cerro_valvula_recirculacion_quedo_cerrada?.estado
+    );
+    addCheckItem2(
+      'ARRANQUE DE BOMBA JOCKEY NORMAL',
+      items.arranque_bomba_jockey_normal?.estado,
+      items.psi_arranque ? `PSI ARRANQUE: ${items.psi_arranque}` : null
+    );
+    addCheckItem2(
+      'PARADA DE BOMBA JOCKEY NORMAL',
+      items.parada_bomba_jockey_normal?.estado,
+      items.psi_parada ? `PSI PARADA: ${items.psi_parada}` : null
+    );
+    addCheckItem2(
+      'ESTADO FÍSICO Y LECTURA DE MANÓMETRO CORRECTA',
+      items.estado_fisico_lectura_manometro_correcta?.estado
+    );
+    addCheckItem2(
+      'ESTADO FÍSICO DE VÁLVULA DE ASPIRACIÓN NORMAL',
+      items.estado_fisico_valvula_aspiracion_normal?.estado
+    );
+    addCheckItem2(
+      'ESTADO FÍSICO DE VÁLVULA DE DESCARGA NORMAL',
+      items.estado_fisico_valvula_descarga_normal?.estado
+    );
+    addCheckItem2(
+      'ESTADO FÍSICO DE VÁLVULA DE RECIRCULACIÓN NORMAL',
+      items.estado_fisico_valvula_recirculacion_normal?.estado
+    );
+    addCheckItem2(
+      'ESTADO DE VÁLVULA DE ALIVIO NORMAL',
+      items.estado_valvula_alivio_normal?.estado
+    );
+    addCheckItem2(
+      'INTERRUPTOR DE COMANDO DE BOMBAS EN POSICIÓN AUTOMÁTICO',
+      items.interruptor_comando_bombas_posicion_automatico?.estado
+    );
+    addCheckItem2(
+      'NIVEL DE ACEITE DEL CÁRTER NORMAL',
+      items.nivel_aceite_carter_normal?.estado
+    );
+    addCheckItem2(
+      'INSPECCIÓN DE DISYUNTORES',
+      items.inspeccion_disyuntores?.estado
+    );
+    addCheckItem2(
+      'ESTADO FÍSICO DEL MANÓMETRO NORMAL',
+      items.estado_fisico_manometro_normal?.estado
+    );
+    addCheckItem2(
+      'AJUSTE DE TUERCAS DE PRENSAESTOPAS NECESARIO',
+      items.ajuste_tuercas_prensaestopas_necesario?.estado
+    );
+    addCheckItem2(
+      'RED ESTÁ PRESURIZADA',
+      items.red_esta_presurizada?.estado
+    );
+
+    // NORMA BASADA
+    worksheet2.mergeCells(`A${row2}:C${row2}`);
+    const normaCell2 = worksheet2.getCell(`A${row2}`);
+    normaCell2.value = 'NOTA : PAUTA BASADA NORMA NFPA-25: "Norma para la Inspección, Prueba, y Mantenimiento de Sistemas de Protección contra Incendios a Base de Agua"';
+    normaCell2.font = { bold: true, size: 9 };
+    normaCell2.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    normaCell2.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    normaCell2.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet2.getRow(row2).height = 25;
+    row2++;
+
+    // COMENTARIOS
+    worksheet2.mergeCells(`A${row2}:C${row2}`);
+    const comentarioHeader2 = worksheet2.getCell(`A${row2}`);
+    comentarioHeader2.value = 'COMENTARIOS:';
+    comentarioHeader2.font = { bold: true, italic: true };
+    comentarioHeader2.alignment = { horizontal: 'left', vertical: 'middle' };
+    comentarioHeader2.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    comentarioHeader2.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    row2++;
+
+    worksheet2.mergeCells(`A${row2}:C${row2 + 4}`);
+    const comentarioCell2 = worksheet2.getCell(`A${row2}`);
+    comentarioCell2.value = formulario.comentarios || '';
+    comentarioCell2.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
+    comentarioCell2.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+    worksheet2.getRow(row2).height = 100;
+    row2 += 5;
+
+    // FIRMAS HOJA 2
+    const firmaRow2 = row2;
+    
+    worksheet2.getCell(`A${firmaRow2}`).value = 'FIRMA SUPERVISOR';
+    worksheet2.getCell(`A${firmaRow2}`).font = { bold: true, italic: true };
+    worksheet2.getCell(`A${firmaRow2}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet2.getCell(`A${firmaRow2}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    worksheet2.getCell(`A${firmaRow2}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet2.getCell(`B${firmaRow2}`).value = 'FIRMA SUPERVISOR AREA';
+    worksheet2.getCell(`B${firmaRow2}`).font = { bold: true, italic: true };
+    worksheet2.getCell(`B${firmaRow2}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet2.getCell(`B${firmaRow2}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    worksheet2.getCell(`B${firmaRow2}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet2.getCell(`C${firmaRow2}`).value = 'FIRMA BRIGADA';
+    worksheet2.getCell(`C${firmaRow2}`).font = { bold: true, italic: true };
+    worksheet2.getCell(`C${firmaRow2}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet2.getCell(`C${firmaRow2}`).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFFFFF' }
+    };
+    worksheet2.getCell(`C${firmaRow2}`).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+
+    worksheet2.getRow(firmaRow2).height = 25;
+
+    row2++;
+    ['A', 'B', 'C'].forEach(col => {
+      worksheet2.getCell(`${col}${row2}`).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' }
+      };
+    });
+    worksheet2.getRow(row2).height = 40;
+
+    row2++;
+    if (formulario.firmas?.supervisor) {
+      worksheet2.getCell(`A${row2}`).value = formulario.firmas.supervisor.nombre_usuario;
+      worksheet2.getCell(`A${row2}`).alignment = { horizontal: 'center' };
+    }
+    if (formulario.firmas?.supervisor_area) {
+      worksheet2.getCell(`B${row2}`).value = formulario.firmas.supervisor_area.nombre_usuario;
+      worksheet2.getCell(`B${row2}`).alignment = { horizontal: 'center' };
+    }
+    if (formulario.firmas?.brigada) {
+      worksheet2.getCell(`C${row2}`).value = formulario.firmas.brigada.nombre_usuario;
+      worksheet2.getCell(`C${row2}`).alignment = { horizontal: 'center' };
+    }
+
+    // ============================================
+    // GENERAR Y ENVIAR ARCHIVO CON 2 HOJAS
     // ============================================
     const buffer = await workbook.xlsx.writeBuffer();
     

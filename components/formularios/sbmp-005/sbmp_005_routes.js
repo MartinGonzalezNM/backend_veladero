@@ -10,6 +10,6 @@ router.get("/:id", verificarToken, sbmp_005Controller.obtenerPorId);
 router.put("/:id", verificarToken, sbmp_005Controller.actualizar);
 router.delete("/:id", verificarToken, sbmp_005Controller.eliminar);
 router.get("/tarea/:id", verificarToken, sbmp_005Controller.obtenerPorIdTarea);
-router.get("/tarea/:id/excel", verificarToken, sbmp_005Controller.exportarExcel);
+router.get("/tarea/:id/excel", verificarToken, sbmp_005Controller.exportarExcelCompleto);
 
 export default router;
