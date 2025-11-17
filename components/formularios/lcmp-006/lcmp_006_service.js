@@ -1,9 +1,9 @@
-import { mp_006Model } from "./mp_006_model.js";
+import { lcmp_006Model } from "./lcmp_006_model.js";
 import { TareaService } from "../../tarea/tarea_service.js";
 
-export const mp_006Service = {
-  async crearMp006(data) {
-    const nuevoRegistro = new mp_006Model(data);
+export const lcmp_006Service = {
+  async crearLcmp006(data) {
+    const nuevoRegistro = new lcmp_006Model(data);
     
     // Cambiar el estado de la tarea a 'completada'
     await TareaService.finalizarTarea(data.id_tarea);
@@ -11,7 +11,7 @@ export const mp_006Service = {
   },
 
   async obtenerTodos() {
-    return await mp_006Model.find()
+    return await lcmp_006Model.find()
       .populate("id_tarea")
       .populate("firmas.supervisor")
       .populate("firmas.supervisor_area")
@@ -19,7 +19,7 @@ export const mp_006Service = {
   },
 
   async actualizar(id, data) {
-    return await mp_006Model.findByIdAndUpdate(id, data, { 
+    return await lcmp_006Model.findByIdAndUpdate(id, data, { 
       new: true,
       runValidators: true 
     }).populate("id_tarea")
@@ -29,10 +29,10 @@ export const mp_006Service = {
   },
 
   async eliminar(id) {
-    return await mp_006Model.findByIdAndDelete(id);
+    return await lcmp_006Model.findByIdAndDelete(id);
   },
   async obtenerPorId(id) {
-  return await mp_006Model.findById(id)
+  return await lcmp_006Model.findById(id)
     .populate({
       path: "id_tarea",
       populate: [
@@ -49,7 +49,7 @@ export const mp_006Service = {
 },
 
 async obtenerPorIdTarea(id_tarea) {
-  return await mp_006Model.findOne({ id_tarea })
+  return await lcmp_006Model.findOne({ id_tarea })
     .populate({
       path: "id_tarea",
       populate: [

@@ -35,8 +35,7 @@ import empmp_002Routes from "./components/formularios/empmp-002/empmp_002_routes
 import cvmp_003Routes from "./components/formularios/cvmp-003/cvmp_003_routes.js"
 import sbmp_005Routes from "./components/formularios/sbmp-005/sbmp_005_routes.js"
 import pfsbmp_007Routes from "./components/formularios/pfsbmp-007/pfsbmp_007_routes.js"
-import mp_006Routes from "./components/formularios/mp-006/mp_006_routes.js"
-
+import lcmp_006Routes from "./components/formularios/lcmp-006/lcmp_006_routes.js"
 
 
 
@@ -90,7 +89,7 @@ app.use("/api/formulario/empmp-002", uploadLimiter, empmp_002Routes);
 app.use("/api/formulario/cvmp-003", uploadLimiter, cvmp_003Routes);
 app.use("/api/formulario/sbmp-005", uploadLimiter, sbmp_005Routes);
 app.use("/api/formulario/pfsbmp-007", uploadLimiter, pfsbmp_007Routes);
-app.use("/api/formulario/mp-006", uploadLimiter, mp_006Routes);
+app.use("/api/formulario/lcmp-006", uploadLimiter, lcmp_006Routes);
 
 // Observaciones - Rate limiting moderado
 app.use("/api/observaciones", observacionesLimiter, observacionesRoutes);

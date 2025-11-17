@@ -18,13 +18,13 @@ const lineaSchema = new mongoose.Schema({
 
 }, { _id: false });
 
-const mp_006Schema = new mongoose.Schema({
+const lcmp_006Schema = new mongoose.Schema({
   id_tarea: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Tarea", 
     required: true 
   },
-  codigo_formulario: { type: String, default: "MP-006" },
+  codigo_formulario: { type: String, default: "LCMP-006" },
   nombre_formulario: { type: String, default: "LAVADO DE CAÑERIAS Y RECIRCULACION DE AGUA" },
   
   fecha_inspeccion: { type: Date, default: Date.now },
@@ -58,4 +58,4 @@ const mp_006Schema = new mongoose.Schema({
   timestamps: true
 });
 
-export const mp_006Model = mongoose.model("mp_006", mp_006Schema);
+export const lcmp_006Model = mongoose.model("lcmp_006", lcmp_006Schema);
