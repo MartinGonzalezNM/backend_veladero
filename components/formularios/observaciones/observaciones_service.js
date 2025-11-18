@@ -7,6 +7,7 @@ import {empmp_002Model} from "../empmp-002/empmp_002_model.js";
 import { lcmp_006Model } from "../lcmp-006/lcmp_006_model.js";
 import { pfsbmp_007Model } from "../pfsbmp-007/pfsbmp_007_model.js";
 import { sbmp_005Model } from "../sbmp-005/sbmp_005_model.js";
+import { spalmp_009Model } from "../spalmp-009/spalmp_009_model.js";
 
 // Registro de todos los modelos de formularios
 const MODELOS_FORMULARIOS = {
@@ -22,6 +23,7 @@ const MODELOS_FORMULARIOS = {
   pfsbmp_007: pfsbmp_007Model,
   sbmp_005: sbmp_005Model,
   sdscmp_008: sdscmp_008Model,
+  spalmp_009: spalmp_009Model,
   // Aquí irás agregando los demás formularios conforme los necesites
 };
 
