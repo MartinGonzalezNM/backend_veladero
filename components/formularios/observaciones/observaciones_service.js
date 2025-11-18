@@ -1,12 +1,27 @@
 import { csevr_001Model } from "../csevr-001/csevr_001_model.js";
 import { sdscmp_008Model } from "../sdscmp-008/sdscmp_008_model.js";
+import { cvmp_003Model } from "../cvmp-003/cvmp_003_model.js";
+import {ddmp_004Model} from "../ddmp-004/ddmp_004_model.js";
 import { emhmp_001Model } from "../emhmp-001/emhmp_001_model.js";
+import {empmp_002Model} from "../empmp-002/empmp_002_model.js";
+import { lcmp_006Model } from "../lcmp-006/lcmp_006_model.js";
+import { pfsbmp_007Model } from "../pfsbmp-007/pfsbmp_007_model.js";
+import { sbmp_005Model } from "../sbmp-005/sbmp_005_model.js";
 
 // Registro de todos los modelos de formularios
 const MODELOS_FORMULARIOS = {
   csevr_001: csevr_001Model,
   sdscmp_008: sdscmp_008Model,
   emhmp_001: emhmp_001Model,
+  pfsbmp_007: pfsbmp_007Model,
+  cvmp_003: cvmp_003Model,
+  ddmp_004: ddmp_004Model,
+  emhmp_001: emhmp_001Model,
+  empmp_002: empmp_002Model,
+  lcmp_006: lcmp_006Model,
+  pfsbmp_007: pfsbmp_007Model,
+  sbmp_005: sbmp_005Model,
+  sdscmp_008: sdscmp_008Model,
   // Aquí irás agregando los demás formularios conforme los necesites
 };
 

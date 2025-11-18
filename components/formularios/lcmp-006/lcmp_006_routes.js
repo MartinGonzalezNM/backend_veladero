@@ -10,6 +10,6 @@ router.get("/:id", verificarToken, lcmp_006Controller.obtenerPorId);
 router.put("/:id", verificarToken, lcmp_006Controller.actualizar);
 router.delete("/:id", verificarToken, lcmp_006Controller.eliminar);
 router.get("/tarea/:id", verificarToken, lcmp_006Controller.obtenerPorIdTarea);
-//router.get("/tarea/:id/excel", verificarToken, lcmp_006Controller.exportarExcelCompleto);
+router.get("/tarea/:id/excel", verificarToken, lcmp_006Controller.exportarExcel);
 
 export default router;

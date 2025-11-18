@@ -11,6 +11,7 @@ router.put("/:id", verificarToken, pfsbmp_007Controller.actualizar);
 router.delete("/:id", verificarToken, pfsbmp_007Controller.eliminar);
 
 router.get("/tarea/:id", verificarToken, pfsbmp_007Controller.obtenerPorIdTarea);
+router.get("/tarea/:id/excel", verificarToken, pfsbmp_007Controller.exportarExcel);
 
 
 export default router;

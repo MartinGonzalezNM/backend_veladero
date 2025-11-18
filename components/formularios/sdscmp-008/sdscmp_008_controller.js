@@ -267,54 +267,56 @@ async exportarExcel(req, res) {
     worksheet.getRow(currentRow).height = 30;
     currentRow++;
 
-    // ============================================
-    // CHECKLIST ITEMS
-    // ============================================
-    const checklistItems = [
-      { label: 'EL PANEL DE ALARMA DE LA CENTRAL ESTA OPERATIVO', field: 'panel_alarma_operativo' },
-      { label: 'LOS PILOTOS Y LED DE ALARMA DE INCENDIO ESTÁN OPERATIVOS', field: 'pilotos_led_operativos' },
-      { label: 'DETECTORES DE TEMPERATURA ESTÁN OPERATIVO', field: 'detectores_temperatura_operativos' },
-      { label: 'DETECTORES DE HUMO ESTÁN OPERATIVO', field: 'detectores_humo_operativos' },
-      { label: 'ACCIONADORES MANUALES', field: 'accionadores_manuales' },
-      { label: 'FUENTE DE ALIMENTACIÓN PRINCIPAL INDICAR VOLTAJE', field: 'fuente_alimentacion_principal_voltaje' },
-      { label: 'FUENTE DE ALIMENTACIÓN SECUNDARIA INDICAR VOLTAJE', field: 'fuente_alimentacion_secundaria_voltaje' },
-      { label: 'TENSIÓN DE BATERÍA A PLENA CARGA INDICAR VOLTAJE', field: 'tension_bateria_plena_carga_voltaje' },
-      { label: 'TENSIÓN DE BATERÍA INDICAR VOLTAJE', field: 'tension_bateria_voltaje' },
-      { label: 'SE HAN PROBADO DETECTORES FOTOELÉCTRICOS', field: 'probado_detectores_fotoelectricos' },
-      { label: 'SE HAN PROBADO DETECTORES DE TEMPERATURAS', field: 'probado_detectores_temperatura' },
-      { label: 'SENSORES DE ACCIONAMIENTO MANUAL', field: 'sensores_accionamiento_manual' },
-      { label: 'VERIFIQUE CONECTORES Y DISPOSITIVO DE SEÑALES AUDIO VISUALES', field: 'verifico_conectores_senales_visuales' },
-      { label: 'CONTROL DE LAZO Y LAZO ABIERTO', field: 'control_lazo_abierto' },
-      { label: 'SE RETIRARON DETECTORES DE SU BASE A FIN DE CHEQUEAR CONEXIÓN', field: 'retiraron_detectores_chequear_conexion' },
-      { label: 'EL ENCLAVAMIENTO DE SISTEMAS ES ADECUADO', field: 'enclavamiento_sistemas_adecuado' },
-      { label: 'SE LIMPIO GABINETE DE CENTRAL, BATERÍAS Y CONEXIONES', field: 'limpio_gabinete_baterias_conexiones' }
-    ];
+  // ============================================
+// CHECKLIST ITEMS
+// ============================================
+const checklistItems = [
+  { label: 'NUMERO DE PRECINTO EXISTENTE', field: 'numero_precinto_existente' },
+  { label: 'NUMERO DE PRECINTO NUEVO', field: 'numero_precinto_nuevo' },
+  { label: 'EL PANEL DE ALARMA DE LA CENTRAL ESTA OPERATIVO', field: 'panel_alarma_operativo' },
+  { label: 'LOS PILOTOS Y LED DE ALARMA DE INCENDIO ESTÁN OPERATIVOS', field: 'pilotos_led_operativos' },
+  { label: 'DETECTORES DE TEMPERATURA ESTÁN OPERATIVO', field: 'detectores_temperatura_operativos' },
+  { label: 'DETECTORES DE HUMO ESTÁN OPERATIVO', field: 'detectores_humo_operativos' },
+  { label: 'ACCIONADORES MANUALES', field: 'accionadores_manuales' },
+  { label: 'FUENTE DE ALIMENTACIÓN PRINCIPAL INDICAR VOLTAJE', field: 'fuente_alimentacion_principal_voltaje' },
+  { label: 'FUENTE DE ALIMENTACIÓN SECUNDARIA INDICAR VOLTAJE', field: 'fuente_alimentacion_secundaria_voltaje' },
+  { label: 'TENSIÓN DE BATERÍA A PLENA CARGA INDICAR VOLTAJE', field: 'tension_bateria_plena_carga_voltaje' },
+  { label: 'TENSIÓN DE BATERÍA INDICAR VOLTAJE', field: 'tension_bateria_voltaje' },
+  { label: 'SE HAN PROBADO DETECTORES FOTOELÉCTRICOS', field: 'probado_detectores_fotoelectricos' },
+  { label: 'SE HAN PROBADO DETECTORES DE TEMPERATURAS', field: 'probado_detectores_temperatura' },
+  { label: 'SENSORES DE ACCIONAMIENTO MANUAL', field: 'sensores_accionamiento_manual' },
+  { label: 'VERIFIQUE CONECTORES Y DISPOSITIVO DE SEÑALES AUDIO VISUALES', field: 'verifico_conectores_senales_visuales' },
+  { label: 'CONTROL DE LAZO Y LAZO ABIERTO', field: 'control_lazo_abierto' },
+  { label: 'SE RETIRARON DETECTORES DE SU BASE A FIN DE CHEQUEAR CONEXIÓN', field: 'retiraron_detectores_chequear_conexion' },
+  { label: 'EL ENCLAVAMIENTO DE SISTEMAS ES ADECUADO', field: 'enclavamiento_sistemas_adecuado' },
+  { label: 'SE LIMPIO GABINETE DE CENTRAL, BATERÍAS Y CONEXIONES', field: 'limpio_gabinete_baterias_conexiones' }
+];
 
-    checklistItems.forEach(item => {
-      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
-      const labelCell = worksheet.getCell(`A${currentRow}`);
-      labelCell.value = item.label;
-      labelCell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-      labelCell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        right: { style: 'thin' },
-        bottom: { style: 'thin' }
-      };
+checklistItems.forEach(item => {
+  worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+  const labelCell = worksheet.getCell(`A${currentRow}`);
+  labelCell.value = item.label;
+  labelCell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+  labelCell.border = {
+    top: { style: 'thin' },
+    left: { style: 'thin' },
+    right: { style: 'thin' },
+    bottom: { style: 'thin' }
+  };
 
-      const valueCell = worksheet.getCell(`D${currentRow}`);
-      valueCell.value = formulario.checklist?.[item.field] || '';
-      valueCell.alignment = { horizontal: 'center', vertical: 'middle' };
-      valueCell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        right: { style: 'thin' },
-        bottom: { style: 'thin' }
-      };
+  const valueCell = worksheet.getCell(`D${currentRow}`);
+  valueCell.value = formulario.checklist?.[item.field] || '';
+  valueCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  valueCell.border = {
+    top: { style: 'thin' },
+    left: { style: 'thin' },
+    right: { style: 'thin' },
+    bottom: { style: 'thin' }
+  };
 
-      worksheet.getRow(currentRow).height = 30;
-      currentRow++;
-    });
+  worksheet.getRow(currentRow).height = 30;
+  currentRow++;
+});
 
     // ============================================
     // COMENTARIOS
