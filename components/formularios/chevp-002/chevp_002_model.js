@@ -9,13 +9,48 @@ const chevp_002Schema = new mongoose.Schema({
   fecha_inspeccion: { type: Date, default: Date.now },
 
   checklist: {
-    truck_shop: { type: String},
-    almacen: { type: String},
-    valvula_reductora_presion: { type: String},
-    secundario_viejo: { type: String},
-    primario_nuevo: { type: String},
-    puyrredon_mina: { type: String},
-    planta_proceso: { type: String}
+    truck_shop: { 
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    },
+    almacen: { 
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    },
+    valvula_reductora_presion: { 
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    },
+    secundario_viejo: { 
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    },
+    primario_nuevo: {
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},      
+    },
+    puyrredon_mina: {
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    },
+    planta_proceso: {
+      agua_arriba_pin_rack:{type: String},
+      agua_abajo_pin_rack:{type: String},
+      agua_arriba_sprinkler:{type: String},
+      agua_abajo_sprinkler:{type: String},
+    }
   },
 
   comentario: { type: String },
