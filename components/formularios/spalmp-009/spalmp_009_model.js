@@ -96,6 +96,7 @@ const spalmp_009Schema = new mongoose.Schema(
       estado_general_limpieza_gabinete:{type:String},
       estado_uniones_boquillas:{type:String},
       soporte_fijacion_canalizacion:{type:String},
+      estado_componentes_valvula:{type:String},
       estado_fisico_operacional_cilindro:{type:String},
       estado_funcionamiento_manometro:{type:String},
     },
