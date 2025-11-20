@@ -10,6 +10,7 @@ router.get("/:id", verificarToken, chevp_002Controller.obtenerPorId);
 router.get("/tarea/:id", verificarToken, chevp_002Controller.obtenerPorIdTarea);
 router.put("/:id", verificarToken, chevp_002Controller.actualizar);
 router.delete("/:id", verificarToken, chevp_002Controller.eliminar);
+router.get("/tarea/:id/excel", verificarToken, chevp_002Controller.exportarExcel);
 
 /*
 router.patch("/:id/marcar-observacion-leida", csevr_001Controller.marcarObservacionLeida);
